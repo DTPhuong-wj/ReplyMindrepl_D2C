@@ -1,0 +1,168 @@
+// ==============================================================================
+// Sơ đồ Cơ sở Dữ liệu Prisma: Hệ thống ReplyMind
+// Các Mô hình Thực thể: User, Conversation, Message, KnowledgeBase, AIFeedback
+// ==============================================================================
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  AGENT       // Nhân viên hỗ trợ
+  SUPERVISOR  // Trưởng nhóm giám sát
+  ADMIN       // Quản trị viên hệ thống
+}
+
+enum ConversationStatus {
+  OPEN              // Đang mở / Chờ tiếp nhận
+  PENDING_CUSTOMER  // Chờ phản hồi từ khách hàng
+  RESOLVED          // Đã giải quyết xong
+  CLOSED            // Đã đóng hội thoại
+}
+
+enum PriorityLevel {
+  LOW     // Mức ưu tiên thấp
+  MEDIUM  // Mức trung bình
+  HIGH    // Mức cao
+  URGENT  // Khẩn cấp
+}
+
+enum IntentType {
+  ORDER_STATUS      // Tra cứu tình trạng đơn hàng
+  RETURN_REQUEST    // Yêu cầu đổi trả / hoàn tiền
+  PRODUCT_INQUIRY   // Hỏi đáp về sản phẩm / tư vấn
+  BILLING_ISSUE     // Vấn đề thanh toán / hóa đơn
+  GENERAL_FEEDBACK  // Ý kiến đóng góp chung
+  OTHER             // Khác
+}
+
+enum SentimentType {
+  POSITIVE    // Tích cực
+  NEUTRAL     // Trung tính
+  FRUSTRATED  // Thất vọng / khó chịu
+  ANGRY       // Giận dữ
+}
+
+enum BrandTone {
+  FRIENDLY      // Thân thiện & nhiệt tình
+  PROFESSIONAL  // Chuyên nghiệp & ngắn gọn
+  CASUAL        // Gần gũi & trẻ trung
+  FORMAL        // Trang trọng & lịch sự
+}
+
+enum MessageSender {
+  CUSTOMER    // Tin nhắn từ khách hàng
+  AGENT       // Tin nhắn do nhân viên gửi
+  AI_COPILOT  // Dự thảo hoặc phản hồi từ AI
+  SYSTEM      // Thông báo tự động từ hệ thống
+}
+
+enum FeedbackAction {
+  ACCEPTED_UNMODIFIED   // Chấp thuận nguyên văn bản nháp của AI
+  ACCEPTED_WITH_EDITS   // Chấp thuận sau khi nhân viên có chỉnh sửa
+  REJECTED              // Từ chối sử dụng bản nháp
+  FLAGGED_INACCURATE    // Báo cáo nội dung AI không chính xác
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String?
+  role          Role           @default(AGENT)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  assignedConversations Conversation[] @relation("AssignedAgent")
+  authoredArticles      KnowledgeBase[] @relation("ArticleAuthor")
+  feedbackGiven         AIFeedback[]   @relation("AgentFeedback")
+
+  @@map("users")
+}
+
+model Conversation {
+  id              String             @id @default(cuid())
+  customerEmail   String
+  customerName    String?
+  status          ConversationStatus @default(OPEN)
+  priority        PriorityLevel      @default(MEDIUM)
+  detectedIntent  IntentType?
+  latestSentiment SentimentType?
+  
+  assignedAgentId String?
+  assignedAgent   User?              @relation("AssignedAgent", fields: [assignedAgentId], references: [id])
+  
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  messages        Message[]
+  aiFeedback      AIFeedback[]
+
+  @@index([status, priority])
+  @@index([assignedAgentId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String        @id @default(cuid())
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  senderType     MessageSender
+  senderId       String?
+  content        String        @db.Text
+  
+  // Siêu dữ liệu AI phân tích cho tin nhắn của khách hàng
+  intent         IntentType?
+  sentiment      SentimentType?
+  confidence     Float?
+
+  createdAt      DateTime      @default(now())
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model KnowledgeBase {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  category    String
+  content     String    @db.Text
+  isPublished Boolean   @default(true)
+  
+  authorId    String
+  author      User      @relation("ArticleAuthor", fields: [authorId], references: [id])
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([category, isPublished])
+  @@map("knowledge_base")
+}
+
+model AIFeedback {
+  id              String         @id @default(cuid())
+  conversationId  String
+  conversation    Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  agentId         String
+  agent           User           @relation("AgentFeedback", fields: [agentId], references: [id])
+  
+  promptVersion   String?
+  suggestedReply  String         @db.Text
+  finalReplySent  String?        @db.Text
+  actionTaken     FeedbackAction
+  rating          Int?           // Điểm số đánh giá từ 1 đến 5 sao
+  comment         String?
+  
+  createdAt       DateTime       @default(now())
+
+  @@index([conversationId])
+  @@index([agentId])
+  @@map("ai_feedback")
+}

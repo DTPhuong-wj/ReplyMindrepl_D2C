@@ -1,0 +1,72 @@
+openapi: 3.1.0
+info:
+  title: Đặc Tả Giao Diện Lập Trình ReplyMind API
+  description: Hợp đồng đặc tả REST API cho hệ thống AI Co-pilot chăm sóc khách hàng ReplyMind.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Máy chủ Môi trường Phát triển Cục bộ
+paths:
+  /conversations:
+    get:
+      summary: Lấy danh sách các cuộc hội thoại hỗ trợ đang hoạt động
+      responses:
+        '200':
+          description: Lấy danh sách hội thoại thành công
+    post:
+      summary: Khởi tạo một cuộc hội thoại hỗ trợ khách hàng mới
+      responses:
+        '201':
+          description: Khởi tạo cuộc hội thoại thành công
+  /conversations/{id}/messages:
+    get:
+      summary: Lấy toàn bộ lịch sử tin nhắn của một cuộc hội thoại
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách tin nhắn thành công
+    post:
+      summary: Gửi hoặc lưu trữ một tin nhắn mới trong luồng hội thoại
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Tin nhắn đã được lưu trữ thành công
+  /ai/analyze:
+    post:
+      summary: Phân tích ý định, cảm xúc và mức độ khẩn cấp của tin nhắn
+      responses:
+        '200':
+          description: Trả về kết quả phân tích AI thành công
+  /ai/generate-reply:
+    post:
+      summary: Sinh bản nháp phản hồi AI dựa trên tri thức RAG và văn phong thương hiệu
+      responses:
+        '200':
+          description: Sinh câu trả lời dự thảo thành công
+  /knowledge-base:
+    get:
+      summary: Lấy danh sách các bài viết chính sách và câu hỏi thường gặp FAQ
+      responses:
+        '200':
+          description: Lấy danh sách bài viết thành công
+    post:
+      summary: Tạo mới và lập chỉ mục vector cho bài viết chính sách
+      responses:
+        '201':
+          description: Tạo bài viết và lập chỉ mục thành công
+  /feedback:
+    post:
+      summary: Ghi nhận đánh giá phản hồi của nhân viên về gợi ý của AI (chấp nhận/sửa/từ chối)
+      responses:
+        '201':
+          description: Đã ghi nhận phản hồi thành công
