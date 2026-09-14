@@ -40,6 +40,14 @@ ReplyMind được xây dựng theo mô hình kiến trúc sạch (Clean Archite
 
 ---
 
+## 📂 Cấu Trúc Quản Lý Prompts 9 Chương
+
+Kho lưu trữ `prompts/` được tổ chức thành 2 nhánh phục vụ cả vận hành ứng dụng và làm bằng chứng học tập:
+- `prompts/system/`: Các System Prompt phục vụ nghiệp vụ AI của ứng dụng (`intent_classifier.txt`, `sentiment_analyzer.txt`, `reply_generator.txt`).
+- `prompts/meta_agent/`: Phân chia theo 9 chương (`chapter_01` đến `chapter_09`), lưu trữ toàn bộ các câu lệnh đàm thoại Meta Prompt, phân tích bài toán và nhật ký phê duyệt với con người (HITL Audit).
+
+---
+
 ## 🚀 Hướng Dẫn Cài Đặt Môi Trường Phát Triển
 
 ### Yêu Cầu Tiên Quyết
@@ -86,6 +94,14 @@ ReplyMind được xây dựng theo mô hình kiến trúc sạch (Clean Archite
   ```bash
   npm run test:e2e
   ```
+
+---
+
+## 📂 Cấu Trúc Quản Lý Prompts 9 Chương
+
+Kho lưu trữ `prompts/` được tổ chức thành 2 nhánh phục vụ cả vận hành ứng dụng và làm bằng chứng học tập:
+- `prompts/system/`: Các System Prompt phục vụ nghiệp vụ AI của ứng dụng (`intent_classifier.txt`, `sentiment_analyzer.txt`, `reply_generator.txt`).
+- `prompts/meta_agent/`: Phân chia theo 9 chương (`chapter_01` đến `chapter_09`), lưu trữ toàn bộ các câu lệnh đàm thoại Meta Prompt, phân tích bài toán và nhật ký phê duyệt với con người (HITL Audit).
 
 ---
 

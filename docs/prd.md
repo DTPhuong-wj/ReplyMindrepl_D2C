@@ -1,34 +1,27 @@
-# Tài Liệu Yêu Cầu Sản Phẩm (PRD): ReplyMind
+# TÀI LIỆU YÊU CẦU SẢN PHẨM: REPLYMIND (PRD)
 
 <!--
-  Tài liệu: Product Requirements Document (PRD)
-  Dự án: ReplyMind - Trợ lý AI Co-pilot Chăm sóc Khách hàng D2C
-  Trạng thái: Bản thảo Khung đặc tả (Boilerplate Specification)
-  Tác giả: KTS Phần mềm AI Cấp cao (Senior AI Software Architect)
+  Tài liệu: Product Requirements Document (PRD) Toàn diện
+  Dự án: ReplyMind - AI Co-pilot for D2C Customer Support
+  Phiên bản: 1.0.0
+  Trạng thái: Hoàn chỉnh (Đồng bộ với chapter-01-ai-in-software-engineering/docs/prd.md)
 -->
 
-## 1. Tóm Tắt Dự Án
-ReplyMind là nền tảng trợ lý thông minh (AI Co-pilot) được thiết kế cho các thương hiệu Bán lẻ Trực tiếp tới Người tiêu dùng (D2C) nhằm nâng cao năng suất xử lý khiếu nại, chuẩn hóa chất lượng phản hồi và gia tăng sự hài lòng của khách hàng. Hệ thống hỗ trợ nhân viên CSKH phân loại hội thoại, tạo câu trả lời căn cứ trên tài liệu chính sách và kích hoạt quy trình tự động.
+Vui lòng tham khảo tài liệu PRD chi tiết đầy đủ tại:
+👉 **[chapter-01-ai-in-software-engineering/docs/prd.md](file:///d:/Code/replymind/chapter-01-ai-in-software-engineering/docs/prd.md)**
 
-## 2. Vấn Đề Cần Giải Quyết
-- Quá tải lượng yêu cầu hỗ trợ trong các dịp cao điểm khuyến mại.
-- Giọng văn thiếu đồng nhất giữa các ca làm việc của nhiều nhân viên.
-- Mất nhiều thời gian tra cứu chính sách đổi trả, bảo hành và giới hạn vận chuyển.
-- Tình trạng kiệt sức của nhân viên hỗ trợ do phải trả lời lặp đi lặp lại các câu hỏi phổ biến.
-
-## 3. Chân Dung Người Dùng (Personas)
-1. **Nhân viên Hỗ trợ Cấp 1 (Tier-1 Agent)**: Cần nhận diện nhanh ý định khách hàng, gợi ý mẫu câu phản hồi sẵn và chèn dự thảo câu trả lời chỉ với 1-Click.
-2. **Trưởng nhóm Hỗ trợ / Quản trị viên (Admin)**: Quản lý bài viết chính sách, tinh chỉnh văn phong thương hiệu và theo dõi chỉ số hiệu suất.
-3. **Khách hàng Mua sắm (Customer)**: Nhận được phản hồi nhanh chóng, thấu cảm và chính xác.
-
-## 4. Các Mô-đun Chức Năng Chính
-- **Mô-đun 1: Bàn Làm Việc Hợp Nhất (Agent Workbench)**: Hộp thư đến, luồng chat trực tiếp, bảng thông tin đơn hàng và khách hàng.
-- **Mô-đun 2: Bộ Máy AI Co-pilot**: Nhận diện ý định (Intent), đánh giá cảm xúc (Sentiment), đề xuất câu trả lời tự động.
-- **Mô-đun 3: Quản Lý Cơ Sở Tri Thức & RAG**: Nạp tài liệu chính sách, phân đoạn (Chunking), tìm kiếm ngữ nghĩa vector.
-- **Mô-đun 4: Tùy Biến Văn Phong Thương Hiệu**: Thiết lập các phong cách (Thân thiện, Chuyên nghiệp, Thoải mái, Trang trọng).
-- **Mô-đun 5: Bảng Thống Kê & Đánh Giá Chất Lượng**: Đo lường Điểm hữu ích của AI, thời gian phản hồi, tỷ lệ hài lòng (CSAT).
-
-## 5. Yêu Cầu Phi Chức Năng
-- Thời gian sinh câu trả lời nháp dưới 1.5 giây (TTFT < 1.5s).
-- Tính sẵn sàng cao (Uptime 99.9%).
-- Tuân thủ quy định bảo mật dữ liệu, không lưu trữ thông tin thẻ thanh toán nhạy cảm.
+### Tóm tắt các nội dung cốt lõi:
+1. **Tầm nhìn & Mục tiêu**: Giảm 60-80% thời gian phản hồi đầu tiên (FRT), đạt độ chính xác phân loại ý định >= 85%, tỷ lệ chấp thuận bản nháp AI >= 70% và điểm đánh giá hữu ích >= 4.0/5.0 sao.
+2. **2 Nhóm Người Dùng (Personas)**:
+   - *Tier-1 Support Agent (Nguyễn Hải Đăng)*: Xử lý hội thoại, tiếp nhận phân tích AI, duyệt hoặc chỉnh sửa bản nháp 1-Click.
+   - *Support Lead / Admin (Trần Thị Mai)*: Quản lý bài viết chính sách Knowledge Base, cấu hình 4 Brand Tone và theo dõi chỉ số hữu ích.
+3. **7 Tính Năng Trọng Tâm (F01 - F07)**:
+   - F01: Hộp thư hợp nhất & nạp hội thoại (Mock data + Webhook simulator).
+   - F02: Phân tích 7 Intent, 3 Sentiment, 4 Priority bằng Google Gemini Flash.
+   - F03: Tra cứu & đối chiếu Cơ sở tri thức chính sách (RAG).
+   - F04: Sinh câu trả lời dự thảo theo 4 Brand Tone (Friendly, Professional, Casual, Formal).
+   - F05: Bàn làm việc kiểm duyệt Human-in-the-Loop (Duyệt, sửa, bấm gửi).
+   - F06: Quản lý bài viết chính sách & Cấu hình văn phong thương hiệu.
+   - F07: Thu thập đánh giá AI Feedback (👍/👎, sao) và widget điểm hữu ích.
+4. **Ranh giới loại trừ (Exclusions)**: Loại trừ 100% Auto-pilot tự động gửi, API mạng xã hội trực tiếp, hệ thống CRM và BI chuyên sâu.
+5. **Ràng buộc công nghệ**: Next.js App Router, TypeScript Strict Mode, Tailwind CSS, Prisma ORM với PostgreSQL / Mock Data fallback, Google Gemini LLM API.

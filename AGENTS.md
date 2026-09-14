@@ -35,10 +35,14 @@ replymind/
 │   ├── architecture.md
 │   ├── openapi.yaml
 │   └── user-flows.md
-├── prompts/                    # Kho lưu trữ System Prompts được quản lý phiên bản
-│   ├── intent_classifier.txt
-│   ├── sentiment_analyzer.txt
-│   └── reply_generator.txt
+├── prompts/                    # Kho lưu trữ Prompts quản lý theo phiên bản và chương học
+│   ├── system/                 # System Prompts vận hành ứng dụng (F02, F04, F05)
+│   │   ├── intent_classifier.txt
+│   │   ├── sentiment_analyzer.txt
+│   │   └── reply_generator.txt
+│   └── meta_agent/             # Meta Prompts & Minh chứng tương tác chia theo 9 chương
+│       ├── chapter_01/         # Minh chứng & Prompt tương tác Chương 1
+│       └── chapter_02/ ...     # chapter_02 đến chapter_09 tương ứng
 ├── prisma/                     # Sơ đồ CSDL Prisma Schema & Migrations
 │   └── schema.prisma
 ├── src/
