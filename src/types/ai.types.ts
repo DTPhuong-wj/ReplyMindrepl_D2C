@@ -3,9 +3,25 @@
  * @description Định nghĩa các hợp đồng kiểu dữ liệu cho phân tích AI, sinh phản hồi và đánh giá.
  */
 
-import { BrandTone, FeedbackAction, IntentType, SentimentType, UrgencyLevel } from "./enums";
+import type { BrandTone, FeedbackAction, IntentType, PriorityLevel, SentimentType, UrgencyLevel } from "./enums.ts";
 
-// Kết quả phân loại ý định từ LLM
+// Kết quả phân tích F02 (Structured JSON Output từ LLM)
+export interface F02AnalysisOutput {
+  intent: IntentType;
+  sentiment: SentimentType;
+  priority: PriorityLevel;
+  confidence_score: number;
+  summary_reason: string;
+}
+
+// Kết quả sinh bản nháp F04 (Structured JSON Output từ LLM)
+export interface F04ReplyOutput {
+  draft_reply: string;
+  citations: string[];
+  suggested_action: string;
+}
+
+// Kết quả phân loại ý định từ LLM (tương thích mở rộng)
 export interface IntentAnalysisResult {
   intent: IntentType;
   confidence: number;

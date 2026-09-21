@@ -1,0 +1,23 @@
+[33mcommit 35f247cd19c5440db76dc0488331989b103ebba3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author:     DTPhuong-wj <thanhphuong230840@gmail.com>
+AuthorDate: Sun Sep 20 23:06:34 2026 +0700
+Commit:     DTPhuong-wj <thanhphuong230840@gmail.com>
+CommitDate: Sun Sep 20 23:06:34 2026 +0700
+
+    Initial commit: chapter-2-prompt-engineering
+
+[33mcommit 5bb97b33021d83c6053db718830d5da2244c7c21[m[33m ([m[1;31morigin/main[m[33m)[m
+Author:     DTPhuong-wj <thanhphuong230840@gmail.com>
+AuthorDate: Mon Sep 14 15:30:00 2026 +0700
+Commit:     DTPhuong-wj <thanhphuong230840@gmail.com>
+CommitDate: Mon Sep 14 15:30:00 2026 +0700
+
+    Feature: Hoan thanh chuc nang theo yeu cau
+
+[33mcommit 52970a43731e2a86f0e8bd9cf4488b7c5c231308[m
+Author:     DTPhuong-wj <thanhphuong230840@gmail.com>
+AuthorDate: Tue Sep 8 20:15:13 2026 +0700
+Commit:     DTPhuong-wj <thanhphuong230840@gmail.com>
+CommitDate: Tue Sep 8 20:15:13 2026 +0700
+
+    Initial commit: project setup

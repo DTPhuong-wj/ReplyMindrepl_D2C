@@ -5,9 +5,8 @@ THÔNG TIN TÀI LIỆU (DOCUMENT METADATA)
 - Tên dự án: ReplyMind - AI Co-pilot for D2C Customer Support
 - Tài liệu: Project Brief Chính thức (Đã được phê duyệt bởi Human-in-the-Loop)
 - Phiên bản: 1.0.0
-- Ngày phê duyệt: 2026-11-10
+- Ngày phê duyệt: 08-09-2026
 - Trạng thái: APPROVED
-- Phạm vi: MVP 9 Ngày (Chương 1 - Chương 9)
 ============================================================================== -->
 
 ## 1. Giả thuyết Bài toán (Problem Hypothesis)

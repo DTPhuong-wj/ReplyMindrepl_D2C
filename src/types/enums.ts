@@ -1,6 +1,6 @@
 /**
  * @file enums.ts
- * @description Định nghĩa các kiểu Enums cốt lõi trong hệ thống, đồng bộ với Prisma schema và hợp đồng AI.
+ * @description Định nghĩa các kiểu Enums cốt lõi trong hệ thống, đồng bộ với Prisma schema và hợp đồng AI theo project-context.md.
  */
 
 // Vai trò người dùng trong hệ thống
@@ -9,25 +9,26 @@ export type Role = "AGENT" | "SUPERVISOR" | "ADMIN";
 // Trạng thái cuộc hội thoại
 export type ConversationStatus = "OPEN" | "PENDING_CUSTOMER" | "RESOLVED" | "CLOSED";
 
-// Mức độ ưu tiên của hội thoại
+// Mức độ ưu tiên của hội thoại (4 cấp)
 export type PriorityLevel = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
-// Danh mục ý định của khách hàng
+// Danh mục ý định chuẩn hóa của khách hàng (7 loại chuẩn theo DEC & Vocabulary)
 export type IntentType =
   | "ORDER_STATUS"
-  | "RETURN_REQUEST"
-  | "PRODUCT_INQUIRY"
-  | "BILLING_ISSUE"
-  | "GENERAL_FEEDBACK"
-  | "OTHER";
+  | "SHIPPING"
+  | "DELIVERY_ISSUE"
+  | "RETURN"
+  | "REFUND"
+  | "PRODUCT_QUESTION"
+  | "COMPLAINT";
 
-// Trạng thái cảm xúc của khách hàng
-export type SentimentType = "POSITIVE" | "NEUTRAL" | "FRUSTRATED" | "ANGRY";
+// Trạng thái cảm xúc của khách hàng (3 mức chuẩn)
+export type SentimentType = "POSITIVE" | "NEUTRAL" | "NEGATIVE";
 
 // Mức độ khẩn cấp cần can thiệp
 export type UrgencyLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
-// Văn phong thương hiệu áp dụng khi sinh câu trả lời
+// Văn phong thương hiệu áp dụng khi sinh câu trả lời (4 phong cách)
 export type BrandTone = "FRIENDLY" | "PROFESSIONAL" | "CASUAL" | "FORMAL";
 
 // Đối tượng gửi tin nhắn

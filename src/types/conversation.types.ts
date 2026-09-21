@@ -3,7 +3,7 @@
  * @description Định nghĩa các interface cho cuộc hội thoại, tin nhắn và luồng chat.
  */
 
-import { ConversationStatus, PriorityLevel, IntentType, SentimentType, MessageSender } from "./enums";
+import { ConversationStatus, PriorityLevel, IntentType, SentimentType, MessageSender } from "./enums.ts";
 
 // DTO biểu diễn dữ liệu tin nhắn
 export interface MessageDto {
