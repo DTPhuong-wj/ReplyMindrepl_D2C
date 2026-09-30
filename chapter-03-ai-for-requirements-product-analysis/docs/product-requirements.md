@@ -3,14 +3,15 @@
 <!-- ==============================================================================
 THÔNG TIN TÀI LIỆU (PRD METADATA)
 - Tên dự án: ReplyMind - AI Co-pilot for D2C Customer Support
-- Tài liệu: Product Requirements Document (PRD) Chính Thức
-- Phiên bản: 1.0.0
-- Ngày phê duyệt: 2026-11-11
-- Trạng thái: APPROVED (Đã được con người kiểm duyệt và phê duyệt chính thức)
+- Tài liệu: Product Requirements Document (PRD) Chính Thức Chuẩn Hóa
+- Phiên bản: 1.1.0 (Post-Review Approved)
+- Ngày phê duyệt: 30-09-2026
+- Trạng thái: APPROVED & AUDITED (Đã phản biện P3.2 và được phê duyệt chính thức)
 - Nguồn tham chiếu:
   + chapter-01-ai-in-software-engineering/docs/project-brief.md
   + chapter-02-prompt-engineering/docs/project-context.md
-- Tiến trình thực hiện: P3.1 - Create PRD ($prd-generator)
+  + chapter-03-ai-for-requirements-product-analysis/docs/product-requirements-draft.md
+- Tiến trình thực hiện: P3.1 -> P3.2 Review Gate
 ============================================================================== -->
 
 ## 1. Tầm Nhìn & Mục Tiêu Sản Phẩm (Product Vision & Goals)
@@ -29,14 +30,14 @@ Hệ thống vận hành theo nguyên tắc cốt lõi **"Con người kiểm du
 
 ---
 
-## 2. Người Dùng, Vai Trò & Kiểm Soát Truy Cập (Users, Roles & RBAC)
+## 2. Người Dùng, Vai Trò & Phân Quyền Truy Cập (Users, Roles & RBAC)
 
 Hệ thống hỗ trợ 2 vai trò người dùng nội bộ, đi kèm thanh chuyển đổi vai trò nhanh (Role Switcher) phục vụ kiểm thử tiện lợi trong MVP 9 ngày:
 
-| Vai Trò | Người Dùng Mẫu | Trách Nhiệm Chính | Quyền Hạn (RBAC) |
+| Vai Trò | Người Dùng Mẫu | Trách Nhiệm Chính | Quyền Hạn (RBAC) & Bảo Vệ Đường Dẫn (Route Guard) |
 | :--- | :--- | :--- | :--- |
-| **Agent** (Nhân viên tuyến đầu) | `Nguyễn Hải Đăng` | Xử lý hội thoại, kiểm duyệt bản nháp AI, gửi tin nhắn, đánh giá gợi ý AI. | Xem Inbox; Gửi tin nhắn; Chèn bản nháp AI; Đánh giá 👍/👎. Không có quyền sửa Knowledge Base hoặc Brand Tone toàn cục. |
-| **Supervisor / Admin** (Quản lý) | `Trần Thị Mai` | Giám sát chất lượng CSKH, cấu hình chính sách, quản lý văn phong thương hiệu. | Toàn quyền Agent + CRUD bài viết Knowledge Base; Cấu hình Brand Tone mặc định; Xem dashboard báo cáo chỉ số AI. |
+| **Agent** (Nhân viên tuyến đầu) | `Nguyễn Hải Đăng` | Xử lý hội thoại, kiểm duyệt bản nháp AI, gửi tin nhắn, đánh giá gợi ý AI. | Xem Inbox; Gửi tin nhắn; Chèn bản nháp AI; Đánh giá 👍/👎.<br>*Quy tắc Route Guard*: Ẩn menu Admin trên thanh điều hướng. Nếu truy cập trực tiếp URL Admin (`/admin/*`, `/knowledge-base/*`), hệ thống tự động redirect về `/agent/inbox` kèm thông báo *"Bạn không có quyền truy cập trang này"*. |
+| **Supervisor / Admin** (Quản lý) | `Trần Thị Mai` | Giám sát chất lượng CSKH, cấu hình chính sách, quản lý văn phong thương hiệu. | Toàn quyền Agent + Thêm/Sửa/Xóa bài viết Knowledge Base; Cấu hình Brand Tone mặc định; Xem dashboard báo cáo chỉ số AI. |
 
 ---
 
@@ -47,7 +48,7 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 - **F02**: Bộ Phân tích Tin nhắn Tự động (7 Intent, 3 Sentiment, 4 Priority).
 - **F03**: Cơ sở Tri thức & Đối chiếu Chính sách RAG (Knowledge Base RAG).
 - **F04**: Bộ Sinh Câu Trả Lời AI Co-pilot theo 4 Brand Tone.
-- **F05**: Bàn Làm Việc Kiểm Duyệt (Human-in-the-Loop Workbench).
+- **F05**: Bàn Làm Việc Kiểm Duyệt & Phục Hồi Lỗi (Human-in-the-Loop Workbench & Error Recovery).
 - **F06**: Quản trị Cơ sở Tri thức & Cấu hình Brand Tone (Admin Panel).
 - **F07**: Vòng lặp Phản hồi Đánh giá & Widget Điểm Hữu ích (AI Helpful Score).
 
@@ -63,7 +64,7 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 
 ### 4.2. F02 — Bộ Phân tích Tin nhắn Tự động (AI Analyzer)
 - **US-02**: Là một **Agent**, tôi muốn hệ thống tự động nhận diện ý định, cảm xúc và mức độ khẩn cấp của khách hàng ngay khi có tin nhắn mới để tôi nắm bắt ngữ cảnh trong 3 giây.
-- **FR-02.1**: Hệ thống phải phân loại chính xác tin nhắn vào **1 trong 7 nhóm Intent**:
+- **FR-02.1**: Hệ thống phải phân loại chính xác tin nhắn vào **1 trong 7 nhóm Intent chuẩn hóa duy nhất** (Đồng bộ chuẩn 100% với Enum Prisma CSDL):
   `ORDER_STATUS`, `SHIPPING`, `DELIVERY_ISSUE`, `RETURN`, `REFUND`, `PRODUCT_QUESTION`, `COMPLAINT`.
 - **FR-02.2**: Hệ thống phải đánh giá cảm xúc theo **1 trong 3 mức Sentiment**: `POSITIVE`, `NEUTRAL`, `NEGATIVE`.
 - **FR-02.3**: Hệ thống phải xếp loại mức độ ưu tiên theo **1 trong 4 cấp Priority**: `LOW`, `MEDIUM`, `HIGH`, `URGENT`. (Gắn `URGENT` khi giao trễ > 3 ngày, đe dọa kiện/phốt, hoặc sentiment cực kỳ tiêu cực).
@@ -86,11 +87,12 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 - **FR-04.3 (Chống ảo giác)**: Tuyệt đối không sinh các cam kết hoặc số liệu không có trong tài liệu chính sách. Nếu thiếu thông tin, AI phải xin phép kiểm tra thêm hoặc hướng dẫn khách cung cấp mã đơn để tra cứu.
 - **FR-04.4**: Đề xuất kèm 1 hành động nghiệp vụ cụ thể cho Agent (`suggested_action`).
 
-### 4.5. F05 — Bàn Làm Việc Kiểm Duyệt (Human-in-the-Loop Workbench)
-- **US-05**: Là một **Agent**, tôi muốn có nút "Sử dụng bản nháp" để chèn nhanh câu trả lời vào ô chat và chỉnh sửa theo ý mình trước khi bấm gửi.
+### 4.5. F05 — Bàn Làm Việc Kiểm Duyệt & Phục Hồi Lỗi (Human-in-the-Loop Workbench & Error Recovery)
+- **US-05**: Là một **Agent**, tôi muốn có nút "Sử dụng bản nháp" để chèn nhanh câu trả lời vào ô chat và chỉnh sửa theo ý mình trước khi bấm gửi, đồng thời công việc không bị gián đoạn nếu AI gặp sự cố mạng.
 - **FR-05.1**: Giao diện phải tách biệt hoàn toàn giữa: Khung hiển thị bản nháp AI Co-pilot và Ô soạn thảo tin nhắn chính thức.
 - **FR-05.2**: Hệ thống phải cung cấp nút thao tác 1-Click "Chèn Bản Nháp AI" để sao chép nguyên văn câu gợi ý vào ô nhập liệu mà không gửi ngay.
-- **FR-05.3 (Cấm Auto-pilot)**: Tin nhắn chỉ được phát đi khi nhân viên bấm nút "Gửi" hoặc phím tắt xác nhận. Không có bất kỳ luồng ngầm nào tự gửi tin nhắn ra bên ngoài.
+- **FR-05.3 (Cấm Auto-pilot)**: Tin nhắn chỉ được phát đi khi nhân viên bấm nút "Gửi" hoặc phím tắt xác nhận. Tuyệt đối không có luồng ngầm nào tự gửi tin nhắn ra bên ngoài.
+- **FR-05.4 (Phục hồi Lỗi & Dự phòng Gián đoạn - Error Recovery)**: Khi gọi mô hình LLM bị quá thời gian (timeout > 2.5s) hoặc gặp lỗi mạng / rate-limit (HTTP 429/500), thanh bên AI Co-pilot phải hiển thị thông báo nhẹ nhàng: *"Gợi ý AI tạm thời gián đoạn. Bạn có thể tự soạn tin nhắn hoặc bấm 'Thử lại'"*. Ô soạn thảo tin nhắn của Agent vẫn hoạt động bình thường, tuyệt đối không bị khóa và Agent có thể tự soạn thảo gửi cho khách mà không bị chặn thao tác.
 
 ### 4.6. F06 — Quản Trị Tri Thức & Cấu Hình Văn Phong (Admin Panel)
 - **US-06**: Là một **Admin**, tôi muốn cập nhật nội dung chính sách và chọn văn phong thương hiệu để đồng bộ chất lượng trả lời của toàn bộ đội ngũ.
@@ -101,7 +103,10 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 ### 4.7. F07 — Vòng Lặp Phản Hồi Đánh Giá (Feedback Loop & Helpful Score)
 - **US-07**: Là một **Admin / Agent**, tôi muốn đánh giá mức độ hữu ích của AI và theo dõi tỷ lệ chấp thuận bản nháp để đo lường hiệu quả công việc.
 - **FR-07.1**: Hệ thống phải cung cấp nút đánh giá nhanh 👍 (Hài lòng) và 👎 (Chưa hài lòng) kèm lựa chọn đánh giá 1-5 sao cạnh mỗi bản nháp AI.
-- **FR-07.2**: Hệ thống phải tự động ghi nhận hành vi của Agent: `ACCEPTED_UNMODIFIED` (Dùng nguyên bản), `ACCEPTED_WITH_EDITS` (Có sửa), hoặc `REJECTED` (Không dùng).
+- **FR-07.2 (Phân loại hành vi tự động)**: Hệ thống tự động so sánh chuỗi tin nhắn nhân viên gửi đi với bản nháp AI:
+  - `ACCEPTED_UNMODIFIED`: Nội dung gửi đi trùng khớp 100% bản nháp AI.
+  - `ACCEPTED_WITH_EDITS`: Nhân viên bấm chèn bản nháp và có chỉnh sửa (khác biệt ít nhất 1 ký tự so với câu gợi ý gốc).
+  - `REJECTED`: Nhân viên không sử dụng bản nháp hoặc xóa trắng tự gõ câu trả lời khác hoàn toàn.
 - **FR-07.3**: Hệ thống phải hiển thị Widget thống kê: Điểm số Hữu ích của AI (AI Helpful Score %), Tổng số lượt gợi ý và Tỷ lệ chấp thuận.
 
 ---
@@ -113,7 +118,8 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 | **AC-01** | Phân loại tin nhắn giao chậm bực tức | **Given**: Khách gửi tin "Đơn ORD-9821 trễ 4 ngày rồi, làm ăn kiểu gì vậy?!"<br>**When**: Hệ thống kích hoạt phân tích F02 | **Then**: Trả về JSON: `intent="DELIVERY_ISSUE"`, `sentiment="NEGATIVE"`, `priority="URGENT"`, độ trễ < 1.5s. |
 | **AC-02** | Kiểm soát ảo giác chính sách đổi trả | **Given**: Khách hỏi đổi size trong 30 ngày<br>**When**: F04 sinh phản hồi theo Brand Tone `FRIENDLY` | **Then**: Bản nháp khẳng định đổi miễn phí 30 ngày tận nhà đúng theo KB; không bịa đặt thêm phí phát sinh; trích dẫn đúng bài viết chính sách. |
 | **AC-03** | Thao tác Human-in-the-Loop 1-Click | **Given**: Bản nháp AI hiển thị trên sidebar<br>**When**: Agent click "Chèn Bản Nháp AI" | **Then**: Nội dung được đưa vào ô soạn thảo, con trỏ sẵn sàng cho Agent gõ thêm; tin nhắn **chưa** bị gửi đi cho đến khi Agent bấm nút "Gửi". |
-| **AC-04** | Ghi nhận phản hồi đánh giá | **Given**: Agent bấm nút 👍 và gửi tin nhắn đã sửa nhẹ<br>**When**: Yêu cầu gửi hoàn tất | **Then**: Bản ghi `AIFeedback` được lưu trong DB với trạng thái `ACCEPTED_WITH_EDITS`; Widget điểm hữu ích tự động cập nhật tỷ lệ. |
+| **AC-04** | Ghi nhận phản hồi đánh giá & Phân loại nhãn | **Given**: Agent bấm nút 👍 và gửi tin nhắn đã sửa thêm từ ngữ xưng hô<br>**When**: Yêu cầu gửi hoàn tất | **Then**: Bản ghi `AIFeedback` được lưu trong DB với trạng thái `ACCEPTED_WITH_EDITS`; Widget điểm hữu ích tự động cập nhật tỷ lệ. |
+| **AC-05** | Phục hồi lỗi gián đoạn AI (Error Recovery) | **Given**: Mạng internet bị gián đoạn hoặc API LLM trả về lỗi 429/timeout > 2.5s<br>**When**: Agent mở cuộc hội thoại | **Then**: Thanh bên hiển thị banner cảnh báo thân thiện kèm nút "Thử lại"; ô nhập liệu chính không bị vô hiệu hóa, Agent vẫn gửi được tin nhắn thủ công bình thường. |
 
 ---
 
@@ -143,4 +149,3 @@ Hệ thống tập trung hiện thực hóa trọn vẹn 7 tính năng cốt lõ
 - ❌ **Tích hợp API Mạng Xã Hội Trực tiếp**: Không tích hợp Facebook Graph API, Zalo OA hay TikTok Shop webhook trong MVP.
 - ❌ **Hệ thống CRM Hoàn chỉnh**: Không xây dựng hệ thống quản lý khách hàng tiềm năng, chấm điểm khách hàng hay quản lý giỏ hàng đa kênh.
 - ❌ **Phân tích Dữ liệu Nâng cao (BI & Data Warehouse)**: Không xây dựng hạ tầng dữ liệu lớn hoặc công cụ trực quan hóa phức tạp.
-
