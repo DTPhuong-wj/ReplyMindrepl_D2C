@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplyMind - Concept 2: Modern Frosted Glass / Liquid Pearl</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background: radial-gradient(circle at 10% 20%, rgba(238, 242, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 50%, rgba(243, 232, 255, 0.6) 100%);
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    .pearl-glow {
+      box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.12), 0 4px 12px -2px rgba(168, 85, 247, 0.08);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased overflow-hidden">
+
+  <!-- AMBIENT BACKGROUND GLOWS -->
+  <div class="fixed -top-40 -left-40 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed top-1/2 -right-40 w-96 h-96 bg-indigo-300/25 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="fixed -bottom-40 left-1/3 w-96 h-96 bg-sky-200/30 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- TOP HEADER (FROSTED GLASS) -->
+  <header class="h-16 glass-panel border-b border-white/60 px-6 flex items-center justify-between shrink-0 z-10 pearl-glow">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-indigo-300/50">
+          R
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-800 bg-clip-text text-transparent">ReplyMind</span>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-purple-100/80 to-indigo-100/80 text-indigo-800 font-semibold border border-indigo-200/50">Concept 2: Liquid Pearl</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-medium">Enterprise D2C AI Co-pilot</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5 p-1 glass-card rounded-xl border border-white/80 text-xs font-semibold">
+        <a href="#" class="px-3.5 py-1.5 rounded-lg bg-white text-indigo-700 shadow-sm border border-slate-100">Hộp thư hỗ trợ</a>
+        <a href="#" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all">Cơ sở tri thức</a>
+        <a href="#" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all">Cấu hình văn phong</a>
+        <a href="#" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all">Báo cáo & Đánh giá</a>
+      </nav>
+    </div>
+
+    <!-- ROLE SWITCHER & PROFILE -->
+    <div class="flex items-center gap-3">
+      <div class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-2 border border-white/80 shadow-sm cursor-pointer hover:bg-white/80 transition-all">
+        <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+          Đ
+        </div>
+        <div class="text-left">
+          <div class="text-xs font-bold text-slate-800 leading-tight">Nguyễn Hải Đăng</div>
+          <div class="text-[10px] text-indigo-600 font-medium">Agent Hỗ trợ (usr_agent_01)</div>
+        </div>
+        <svg class="w-3.5 h-3.5 text-slate-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3-COLUMN WORKBENCH -->
+  <main class="flex-1 flex overflow-hidden p-3 gap-3 z-10">
+
+    <!-- CỘT 1: HỘP THƯ ĐẾN (320px) - GLASS PANEL -->
+    <aside class="w-80 glass-panel rounded-2xl flex flex-col shrink-0 overflow-hidden shadow-sm">
+      <!-- Search & Filters -->
+      <div class="p-4 border-b border-white/60 space-y-3">
+        <div class="relative">
+          <input type="text" placeholder="Tìm kiếm hội thoại (Ctrl+K)..." class="w-full pl-9 pr-3 py-2 text-xs bg-white/70 border border-slate-200/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:bg-white transition-all shadow-inner">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <!-- Filter Tabs -->
+        <div class="grid grid-cols-4 gap-1 p-1 bg-slate-100/70 rounded-xl text-[11px] font-semibold text-center">
+          <button class="py-1.5 rounded-lg bg-white text-slate-900 shadow-sm border border-slate-100">Tất cả</button>
+          <button class="py-1.5 rounded-lg text-rose-700 bg-rose-50/80 hover:bg-rose-100/80 transition-all font-bold">Gấp (1)</button>
+          <button class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all">Chờ xử lý</button>
+          <button class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all">Chờ khách</button>
+        </div>
+      </div>
+
+      <!-- Conversation List -->
+      <div class="flex-1 overflow-y-auto p-2 space-y-2">
+        <!-- Item 1: Active & URGENT (Glass Card Glow) -->
+        <div class="p-3.5 rounded-xl bg-white/90 border-2 border-indigo-500/40 shadow-md shadow-indigo-100/50 cursor-pointer relative overflow-hidden transition-all group">
+          <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-rose-500 to-rose-600"></div>
+          <div class="pl-2">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold text-xs text-slate-900">Phạm Minh Tuấn</span>
+              <span class="text-[10px] text-slate-400 font-medium">10 phút</span>
+            </div>
+            <div class="text-xs text-slate-700 font-semibold line-clamp-1 mb-2">
+              Đơn ORD-9821 trễ 4 ngày rồi, làm ăn kiểu gì vậy?!
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-50 text-rose-700 border border-rose-200">URGENT</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">DELIVERY</span>
+              <span class="text-[10px] text-rose-600 font-bold ml-auto flex items-center gap-1">😡 Tiêu cực</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item 2: RETURN -->
+        <div class="p-3.5 rounded-xl glass-card hover:bg-white/80 border border-white/60 cursor-pointer transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-xs text-slate-700">Lê Thu Hà</span>
+            <span class="text-[10px] text-slate-400">1 giờ</span>
+          </div>
+          <div class="text-xs text-slate-500 line-clamp-1 mb-2">
+            Đầm mặc ưng lắm nhưng hơi chật eo, đổi sang size L...
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-50 text-sky-700 border border-sky-100">MEDIUM</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100/70 text-slate-600">RETURN</span>
+            <span class="text-[10px] text-slate-400 ml-auto">😐 Bình thường</span>
+          </div>
+        </div>
+
+        <!-- Item 3: BILLING -->
+        <div class="p-3.5 rounded-xl glass-card hover:bg-white/80 border border-white/60 cursor-pointer transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-xs text-slate-700">Hoàng Anh Dũng</span>
+            <span class="text-[10px] text-slate-400">3 giờ</span>
+          </div>
+          <div class="text-xs text-slate-500 line-clamp-1 mb-2">
+            Thẻ Techcombank của tôi bị trừ 2 lần tiền cho đơn ORD-7750...
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-100">HIGH</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100/70 text-slate-600">REFUND</span>
+            <span class="text-[10px] text-rose-500 ml-auto">🙁 Bực bội</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CỘT 2: KHUNG CHAT CHI TIẾT (Flex-1) - GLASS PANEL -->
+    <section class="flex-1 glass-panel rounded-2xl flex flex-col min-w-0 overflow-hidden shadow-sm">
+      <!-- Chat Header -->
+      <header class="h-16 border-b border-white/60 px-6 flex items-center justify-between shrink-0 bg-white/40">
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-50 border border-indigo-200/50 flex items-center justify-center font-bold text-indigo-700 shadow-sm text-sm">
+            PT
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="font-bold text-sm text-slate-900">Phạm Minh Tuấn</h2>
+              <span class="text-xs text-slate-400">tuan.pham@gmail.com</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80">#ORD-9821</span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium">Sản phẩm: Áo khoác dạ cao cấp Size M (1.850.000 VNĐ) • GHN Express</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button class="px-3.5 py-1.5 rounded-xl glass-card hover:bg-white text-xs font-semibold text-slate-700 border border-white/80 shadow-sm transition-all flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Đánh dấu đã giải quyết</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Message History (Frosted Timeline) -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="text-center">
+          <span class="text-[11px] px-3.5 py-1 rounded-full glass-card text-slate-500 font-semibold border border-white/80 shadow-sm">Hôm nay, 10:15 SA</span>
+        </div>
+
+        <!-- Customer Message -->
+        <div class="flex gap-3 max-w-xl">
+          <div class="w-8 h-8 rounded-xl bg-slate-200/70 border border-white/80 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0 shadow-sm">
+            PT
+          </div>
+          <div>
+            <div class="glass-card p-4 rounded-2xl rounded-tl-sm shadow-sm text-xs leading-relaxed text-slate-800 border border-white/90">
+              Chào shop, tôi đặt đơn #ORD-9821 từ thứ 2 tuần trước, hẹn thứ 5 giao mà hôm nay thứ 2 tuần sau rồi vẫn chưa thấy tăm hơi đâu. Tôi cần áo để đi dự tiệc cưới tối mai!
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block font-medium">10:15 SA • Đã nhận</span>
+          </div>
+        </div>
+
+        <!-- Customer Follow-up (Angry with Rose Sheen) -->
+        <div class="flex gap-3 max-w-xl">
+          <div class="w-8 h-8 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center text-xs font-bold text-rose-700 shrink-0 shadow-sm">
+            PT
+          </div>
+          <div>
+            <div class="p-4 rounded-2xl rounded-tl-sm text-xs leading-relaxed text-slate-800 bg-gradient-to-r from-rose-50/90 to-white/90 border border-rose-200 shadow-sm">
+              Đơn hàng ORD-9821 của tôi trễ 4 ngày rồi mà bưu tá chưa gọi, các bạn làm ăn kiểu gì vậy?! Nếu trước 14h chiều nay không giao tới nơi thì hủy đơn và bồi thường cho tôi!
+            </div>
+            <span class="text-[10px] text-rose-500 mt-1 block font-semibold">10:16 SA • Khách hàng đang chờ phản hồi (Khẩn cấp)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Area (Floating Glass Composer) -->
+      <div class="p-4 bg-white/40 border-t border-white/60 shrink-0">
+        <div class="glass-card rounded-2xl border border-white/90 shadow-md focus-within:ring-2 focus-within:ring-indigo-500/40 focus-within:bg-white transition-all">
+          <textarea id="chatInput" rows="3" placeholder="Nhập câu trả lời hoặc bấm 'Chèn Bản Nháp AI' bên phải... (Ctrl + Enter để gửi)" class="w-full p-3.5 text-xs bg-transparent resize-none focus:outline-none text-slate-800 placeholder-slate-400"></textarea>
+          
+          <div class="px-4 py-2.5 bg-slate-50/50 border-t border-white/60 rounded-b-2xl flex items-center justify-between">
+            <span class="text-[11px] text-slate-400 font-medium">
+              Phím tắt: <kbd class="px-1.5 py-0.5 rounded-md glass-card border border-white text-slate-600 font-mono text-[10px] shadow-sm">Ctrl+Enter</kbd> gửi • <kbd class="px-1.5 py-0.5 rounded-md glass-card border border-white text-slate-600 font-mono text-[10px] shadow-sm">Alt+I</kbd> chèn nháp
+            </span>
+            
+            <button class="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs shadow-md shadow-indigo-300/40 flex items-center gap-2 transition-all">
+              <span>Gửi phản hồi</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CỘT 3: AI CO-PILOT SIDEBAR (380px) - LIQUID PEARL PANEL -->
+    <aside class="w-96 glass-panel rounded-2xl flex flex-col shrink-0 overflow-y-auto shadow-sm">
+      <!-- Header -->
+      <div class="p-4 border-b border-white/60 flex items-center justify-between bg-white/40">
+        <div class="flex items-center gap-2.5">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400 animate-pulse"></div>
+          <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-800">AI Co-pilot Insights</h3>
+        </div>
+        <span class="text-[11px] px-2.5 py-0.5 rounded-full glass-card text-indigo-700 border border-white/80 font-bold shadow-sm">Gemini 1.5 Flash</span>
+      </div>
+
+      <div class="p-4 space-y-4 flex-1">
+        <!-- F02: TRIAGE CARD -->
+        <div class="p-4 glass-card rounded-2xl border border-white/80 space-y-3 pearl-glow">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Phân tích hội thoại (F02)</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-100">Độ tin cậy: 95%</span>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-2.5 rounded-xl bg-white/80 border border-white/90 shadow-sm">
+              <span class="text-[10px] text-slate-400 block mb-0.5 font-medium">Ý định chính</span>
+              <span class="text-xs font-extrabold text-indigo-700">DELIVERY_ISSUE</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gradient-to-br from-rose-50/80 to-pink-50/80 border border-rose-200/80 shadow-sm">
+              <span class="text-[10px] text-rose-500 block mb-0.5 font-medium">Cảm xúc</span>
+              <span class="text-xs font-extrabold text-rose-700">NEGATIVE (Bực tức)</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs px-1">
+            <span class="text-slate-500 font-medium">Mức ưu tiên:</span>
+            <span class="font-extrabold text-rose-700 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200">
+              <span class="w-2 h-2 rounded-full bg-rose-600"></span> URGENT (Khẩn cấp)
+            </span>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-100/60 border border-white text-[11px] text-slate-600 italic">
+            "Khách hàng bức xúc vì đơn hàng trễ 4 ngày chưa nhận được và yêu cầu hủy/bồi thường."
+          </div>
+        </div>
+
+        <!-- F03: KNOWLEDGE BASE CITATION CARD -->
+        <div class="p-4 glass-card rounded-2xl border border-white/80 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Chính sách đối chiếu (F03 RAG)</span>
+            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-bold">Khớp 98%</span>
+          </div>
+          <div class="p-3 bg-white/80 border border-white/90 rounded-xl text-xs space-y-1.5 shadow-sm">
+            <div class="font-bold text-slate-800">Quy Định Vận Chuyển & Cam Kết Thời Gian Giao Hàng</div>
+            <p class="text-[11px] text-slate-600 leading-relaxed font-normal">
+              Điều 2: Đơn hàng giao trễ quá 3 ngày do lỗi vận chuyển được <strong class="text-indigo-700 font-bold">tặng voucher giảm giá 15%</strong> (tối đa 150k) cho đơn tiếp theo và <strong class="text-indigo-700 font-bold">miễn 100% phí ship</strong> đơn hiện tại.
+            </p>
+          </div>
+        </div>
+
+        <!-- F04: AI DRAFT REPLY CARD (PEARL PURPLE SHEEN) -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-purple-50/50 to-white/90 border-2 border-indigo-300/60 shadow-lg shadow-indigo-100/40 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">✨</span>
+              <span class="text-xs font-extrabold text-indigo-950">Bản nháp gợi ý (F04)</span>
+            </div>
+            <!-- Brand Tone Pill -->
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-100/80 text-indigo-800 font-bold border border-indigo-200/50">FORMAL (Trang trọng)</span>
+          </div>
+
+          <div class="p-3.5 bg-white/90 border border-white rounded-xl text-xs leading-relaxed text-slate-800 shadow-sm" id="draftText">
+            Dạ em chào anh Tuấn ạ! Em rất tiếc và thành thật xin lỗi anh về việc đơn hàng ORD-9821 bị trễ hạn 4 ngày khiến anh phiền lòng. Theo chính sách của bên em, đơn hàng trễ quá 3 ngày sẽ được tặng ngay voucher giảm giá 15% cho đơn tiếp theo và miễn 100% phí vận chuyển đơn hiện tại ạ. Em đã làm việc trực tiếp với bưu cục GHN yêu cầu bưu tá phát hỏa tốc trước 14h chiều nay cho anh nhé ạ!
+          </div>
+
+          <!-- 1-Click Action Button with Pearl Gradient -->
+          <button onclick="insertDraft()" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold text-xs shadow-md shadow-indigo-300/40 flex items-center justify-center gap-2 transition-all">
+            <span>✨ Chèn Bản Nháp AI (1-Click)</span>
+          </button>
+        </div>
+
+        <!-- F07: FEEDBACK CARD -->
+        <div class="p-3.5 glass-card rounded-2xl border border-white/80 flex items-center justify-between text-xs">
+          <span class="text-slate-500 font-semibold text-[11px]">Đánh giá bản nháp này:</span>
+          <div class="flex items-center gap-2">
+            <button class="px-2.5 py-1 rounded-lg bg-white/80 hover:bg-white border border-slate-200 text-[11px] font-bold text-slate-700 shadow-sm transition-all">👍 Hữu ích</button>
+            <button class="px-2.5 py-1 rounded-lg bg-white/80 hover:bg-white border border-slate-200 text-[11px] font-bold text-slate-700 shadow-sm transition-all">👎</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    function insertDraft() {
+      const draft = document.getElementById('draftText').innerText.trim();
+      const input = document.getElementById('chatInput');
+      input.value = draft;
+      input.focus();
+    }
+  </script>
+</body>
+</html>

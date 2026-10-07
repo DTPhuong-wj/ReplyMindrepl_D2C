@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplyMind - Concept 1: Clean Minimal Slate</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased">
+
+  <!-- TOP HEADER -->
+  <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
+    <div class="flex items-center gap-8">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+          R
+        </div>
+        <span class="font-bold text-lg tracking-tight text-slate-900">ReplyMind</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium ml-1">Concept 1: Clean Slate</span>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-1 text-sm font-medium">
+        <a href="#" class="px-3 py-1.5 rounded-md bg-indigo-50 text-indigo-700">Hộp thư hỗ trợ</a>
+        <a href="#" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">Cơ sở tri thức</a>
+        <a href="#" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">Cấu hình văn phong</a>
+        <a href="#" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">Báo cáo & Đánh giá</a>
+      </nav>
+    </div>
+
+    <!-- ROLE SWITCHER & PROFILE -->
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-medium text-slate-700 shadow-sm transition-all">
+          <div class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-[10px]">
+            Đ
+          </div>
+          <span>Nguyễn Hải Đăng (Agent)</span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3-COLUMN WORKBENCH -->
+  <main class="flex-1 flex overflow-hidden">
+
+    <!-- CỘT 1: HỘP THƯ ĐẾN (320px) -->
+    <aside class="w-80 border-r border-slate-200 bg-white flex flex-col shrink-0">
+      <!-- Search & Filters -->
+      <div class="p-4 border-b border-slate-100 space-y-3">
+        <div class="relative">
+          <input type="text" placeholder="Tìm kiếm hội thoại (Ctrl+K)..." class="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-1.5 text-[11px] font-medium">
+          <button class="px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm">Tất cả (4)</button>
+          <button class="px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition-colors">Gấp (1)</button>
+          <button class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Chờ xử lý</button>
+          <button class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Chờ khách</button>
+        </div>
+      </div>
+
+      <!-- Conversation List -->
+      <div class="flex-1 overflow-y-auto divide-y divide-slate-100">
+        <!-- Item 1: Active & URGENT -->
+        <div class="p-3.5 bg-indigo-50/70 border-l-4 border-rose-600 cursor-pointer transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-semibold text-xs text-slate-900">Phạm Minh Tuấn</span>
+            <span class="text-[10px] text-slate-500">10 phút</span>
+          </div>
+          <div class="text-xs text-slate-700 font-medium line-clamp-1 mb-1.5">
+            Đơn ORD-9821 trễ 4 ngày rồi, làm ăn kiểu gì vậy?!
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-rose-100 text-rose-700">URGENT</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">DELIVERY_ISSUE</span>
+            <span class="text-[10px] text-rose-600 font-medium ml-auto">😡 Tiêu cực</span>
+          </div>
+        </div>
+
+        <!-- Item 2: RETURN -->
+        <div class="p-3.5 hover:bg-slate-50 border-l-4 border-transparent cursor-pointer transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-semibold text-xs text-slate-800">Lê Thu Hà</span>
+            <span class="text-[10px] text-slate-400">1 giờ</span>
+          </div>
+          <div class="text-xs text-slate-500 line-clamp-1 mb-1.5">
+            Đầm mặc ưng lắm nhưng hơi chật eo, đổi sang size L...
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-sky-50 text-sky-700">MEDIUM</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">RETURN</span>
+            <span class="text-[10px] text-slate-500 ml-auto">😐 Bình thường</span>
+          </div>
+        </div>
+
+        <!-- Item 3: BILLING -->
+        <div class="p-3.5 hover:bg-slate-50 border-l-4 border-transparent cursor-pointer transition-all">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-semibold text-xs text-slate-800">Hoàng Anh Dũng</span>
+            <span class="text-[10px] text-slate-400">3 giờ</span>
+          </div>
+          <div class="text-xs text-slate-500 line-clamp-1 mb-1.5">
+            Thẻ Techcombank của tôi bị trừ 2 lần tiền cho đơn ORD-7750...
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700">HIGH</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">REFUND</span>
+            <span class="text-[10px] text-rose-500 ml-auto">🙁 Bực bội</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CỘT 2: KHUNG CHAT CHI TIẾT (Flex-1) -->
+    <section class="flex-1 bg-slate-50 flex flex-col min-w-0">
+      <!-- Chat Header -->
+      <header class="h-14 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-sm">
+            PT
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="font-bold text-sm text-slate-900">Phạm Minh Tuấn</h2>
+              <span class="text-xs text-slate-500">tuan.pham@gmail.com</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-200">Đơn hàng #ORD-9821</span>
+            </div>
+            <p class="text-[11px] text-slate-500">Sản phẩm: Áo khoác dạ cao cấp Size M (1.850.000 VNĐ)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 shadow-sm transition-all">
+            Đánh dấu đã giải quyết
+          </button>
+        </div>
+      </header>
+
+      <!-- Message History -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="text-center">
+          <span class="text-[11px] px-3 py-1 rounded-full bg-slate-200/60 text-slate-500 font-medium">Hôm nay, 10:15 SA</span>
+        </div>
+
+        <!-- Customer Message -->
+        <div class="flex gap-3 max-w-xl">
+          <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
+            PT
+          </div>
+          <div>
+            <div class="bg-white border border-slate-200 p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-xs leading-relaxed text-slate-800">
+              Chào shop, tôi đặt đơn #ORD-9821 từ thứ 2 tuần trước, hẹn thứ 5 giao mà hôm nay thứ 2 tuần sau rồi vẫn chưa thấy tăm hơi đâu. Tôi cần áo để đi dự tiệc cưới tối mai!
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">10:15 SA • Đã nhận</span>
+          </div>
+        </div>
+
+        <!-- Customer Follow-up (Angry) -->
+        <div class="flex gap-3 max-w-xl">
+          <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shrink-0">
+            PT
+          </div>
+          <div>
+            <div class="bg-white border border-rose-200 p-3.5 rounded-2xl rounded-tl-sm shadow-sm text-xs leading-relaxed text-slate-800">
+              Đơn hàng ORD-9821 của tôi trễ 4 ngày rồi mà bưu tá chưa gọi, các bạn làm ăn kiểu gì vậy?! Nếu trước 14h chiều nay không giao tới nơi thì hủy đơn và bồi thường cho tôi!
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">10:16 SA • Khách hàng đang chờ phản hồi</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="p-4 bg-white border-t border-slate-200 shrink-0">
+        <div class="border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all shadow-sm">
+          <textarea id="chatInput" rows="3" placeholder="Nhập câu trả lời hoặc bấm 'Chèn Bản Nháp AI' bên phải... (Ctrl + Enter để gửi)" class="w-full p-3 text-xs bg-transparent resize-none focus:outline-none text-slate-800"></textarea>
+          
+          <div class="px-3 py-2 bg-slate-50 border-t border-slate-100 rounded-b-xl flex items-center justify-between">
+            <span class="text-[11px] text-slate-400">Phím tắt: <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-[10px]">Ctrl+Enter</kbd> gửi • <kbd class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-[10px]">Alt+I</kbd> chèn nháp</span>
+            
+            <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs shadow-sm flex items-center gap-1.5 transition-all">
+              <span>Gửi phản hồi</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CỘT 3: AI CO-PILOT SIDEBAR (380px) -->
+    <aside class="w-96 border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-y-auto">
+      <!-- Header -->
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <h3 class="font-bold text-xs uppercase tracking-wider text-slate-800">AI Co-pilot Insights</h3>
+        </div>
+        <span class="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">Gemini 1.5 Flash</span>
+      </div>
+
+      <div class="p-4 space-y-4 flex-1">
+        <!-- F02: TRIAGE CARD -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Phân tích hội thoại (F02)</div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <span class="text-[10px] text-slate-400 block mb-0.5">Ý định chính</span>
+              <span class="text-xs font-bold text-indigo-700">DELIVERY_ISSUE</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-rose-200 bg-rose-50/30">
+              <span class="text-[10px] text-rose-500 block mb-0.5">Cảm xúc</span>
+              <span class="text-xs font-bold text-rose-700">NEGATIVE (Bực tức)</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-xs px-1">
+            <span class="text-slate-500">Mức ưu tiên:</span>
+            <span class="font-bold text-rose-700 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-rose-600"></span> URGENT (Khẩn cấp)
+            </span>
+          </div>
+
+          <div class="p-2 rounded bg-slate-100/70 text-[11px] text-slate-600 italic">
+            "Khách hàng bức xúc vì đơn hàng trễ 4 ngày chưa nhận được và yêu cầu hủy/bồi thường."
+          </div>
+        </div>
+
+        <!-- F03: KNOWLEDGE BASE CITATION CARD -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Chính sách đối chiếu (F03 RAG)</span>
+            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-medium">Khớp 98%</span>
+          </div>
+          <div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs space-y-1">
+            <div class="font-semibold text-slate-800">Quy Định Vận Chuyển & Cam Kết Thời Gian Giao Hàng</div>
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              Điều 2: Đơn hàng giao trễ quá 3 ngày do lỗi vận chuyển được <strong class="text-indigo-700">tặng voucher giảm giá 15%</strong> (tối đa 150k) cho đơn tiếp theo và <strong class="text-indigo-700">miễn 100% phí ship</strong> đơn hiện tại.
+            </p>
+          </div>
+        </div>
+
+        <!-- F04: AI DRAFT REPLY CARD -->
+        <div class="p-3.5 bg-indigo-50/50 border-2 border-indigo-200 border-dashed rounded-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="text-sm">✨</span>
+              <span class="text-xs font-bold text-indigo-900">Bản nháp gợi ý (F04)</span>
+            </div>
+            <!-- Brand Tone Pill -->
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 font-semibold">FORMAL (Trang trọng)</span>
+          </div>
+
+          <div class="p-3 bg-white border border-indigo-100 rounded-lg text-xs leading-relaxed text-slate-800 shadow-sm" id="draftText">
+            Dạ em chào anh Tuấn ạ! Em rất tiếc và thành thật xin lỗi anh về việc đơn hàng ORD-9821 bị trễ hạn 4 ngày khiến anh phiền lòng. Theo chính sách của bên em, đơn hàng trễ quá 3 ngày sẽ được tặng ngay voucher giảm giá 15% cho đơn tiếp theo và miễn 100% phí vận chuyển đơn hiện tại ạ. Em đã làm việc trực tiếp với bưu cục GHN yêu cầu bưu tá phát hỏa tốc trước 14h chiều nay cho anh nhé ạ!
+          </div>
+
+          <!-- 1-Click Action Button -->
+          <button onclick="insertDraft()" class="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md shadow-indigo-100 flex items-center justify-center gap-1.5 transition-all">
+            <span>✨ Chèn Bản Nháp AI (1-Click)</span>
+          </button>
+        </div>
+
+        <!-- F07: FEEDBACK CARD -->
+        <div class="p-3 border border-slate-200 rounded-xl flex items-center justify-between bg-white text-xs">
+          <span class="text-slate-500 font-medium text-[11px]">Đánh giá bản nháp này:</span>
+          <div class="flex items-center gap-2">
+            <button class="px-2 py-1 rounded border border-slate-200 hover:bg-slate-50 text-[11px] font-medium text-slate-700 transition-colors">👍 Hữu ích</button>
+            <button class="px-2 py-1 rounded border border-slate-200 hover:bg-slate-50 text-[11px] font-medium text-slate-700 transition-colors">👎</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    function insertDraft() {
+      const draft = document.getElementById('draftText').innerText.trim();
+      const input = document.getElementById('chatInput');
+      input.value = draft;
+      input.focus();
+    }
+  </script>
+</body>
+</html>
+
