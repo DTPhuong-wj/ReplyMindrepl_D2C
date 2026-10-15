@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReplyMind - Interactive Prototype (Modern Frosted Glass / Liquid Pearl)</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Prototype Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Light Orbs -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- TOP APPBAR (Kính mờ) -->
+  <header class="app-header glass-panel">
+    <div class="brand-section">
+      <div class="brand-logo">R</div>
+      <div>
+        <div style="display: flex; align-items: center;">
+          <span class="brand-text">ReplyMind</span>
+          <span class="brand-badge">Interactive Prototype v1.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="nav-tab-btn active" id="tabWorkspace" onclick="switchMainTab('workspace')">
+        Hộp thư hỗ trợ
+      </button>
+      <button class="nav-tab-btn" id="tabKB" onclick="switchMainTab('kb')">
+        Cơ sở tri thức (KB)
+      </button>
+      <button class="nav-tab-btn" id="tabTone" onclick="switchMainTab('tone')">
+        Cấu hình văn phong
+      </button>
+      <button class="nav-tab-btn" id="tabDashboard" onclick="switchMainTab('dashboard')">
+        Báo cáo & Đánh giá
+      </button>
+    </nav>
+
+    <!-- User Profile & Role Switcher -->
+    <div class="user-profile-badge" onclick="openRoleModal()" title="Bấm để đổi vai trò Agent / Supervisor">
+      <div class="user-avatar" id="headerUserAvatar">Đ</div>
+      <div style="text-align: left;">
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-primary);" id="headerUserName">Nguyễn Hải Đăng</div>
+        <div style="font-size: 10px; color: var(--brand-primary); font-weight: 600;" id="headerUserRole">Agent Hỗ trợ (usr_agent_01)</div>
+      </div>
+      <svg style="width: 14px; height: 14px; color: #94A3B8; margin-left: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+    </div>
+  </header>
+
+  <!-- WORKSPACE VIEW (3 CỘT) -->
+  <main class="app-main" id="viewWorkspace">
+
+    <!-- CỘT 1: HỘP THƯ ĐẾN (320px) -->
+    <aside class="inbox-sidebar glass-panel">
+      <div class="inbox-header">
+        <div class="search-box">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="searchInput" placeholder="Tìm kiếm hội thoại (Ctrl+K)..." oninput="handleSearch(this.value)">
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="filter-btn active" id="filterAll" onclick="setFilter('ALL')">Tất cả</button>
+          <button class="filter-btn urgent" id="filterUrgent" onclick="setFilter('URGENT')">Gấp (1)</button>
+          <button class="filter-btn" id="filterUnhandled" onclick="setFilter('UNHANDLED')">Chờ xử lý</button>
+          <button class="filter-btn" id="filterWaiting" onclick="setFilter('WAITING')">Chờ khách</button>
+        </div>
+      </div>
+
+      <!-- Ticket Queue List -->
+      <div class="conversation-list" id="conversationList">
+        <!-- Render động từ mock-data.js qua app.js -->
+      </div>
+    </aside>
+
+    <!-- CỘT 2: KHUNG CHAT CHI TIẾT (Flex-1) -->
+    <section class="chat-section glass-panel">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="customer-info">
+          <div class="customer-avatar" id="chatCustomerAvatar">PT</div>
+          <div class="customer-details">
+            <h3>
+              <span id="chatCustomerName">Phạm Minh Tuấn</span>
+              <span class="tag-badge tag-urgent" id="chatOrderBadge">#ORD-9821</span>
+            </h3>
+            <p id="chatProductSummary">Áo khoác dạ cao cấp Size M (1.850.000₫) • GHN Express</p>
+          </div>
+        </div>
+
+        <button class="btn-feedback" onclick="resolveCurrentTicket()" style="font-weight: 700;">
+          ✓ Đánh dấu đã giải quyết
+        </button>
+      </header>
+
+      <!-- Message History -->
+      <div class="chat-timeline" id="chatTimeline">
+        <!-- Render động qua app.js -->
+      </div>
+
+      <!-- Chat Composer Box -->
+      <div class="chat-composer">
+        <div class="composer-box">
+          <textarea id="composerTextarea" class="composer-textarea" placeholder="Nhập câu trả lời hoặc bấm 'Chèn Bản Nháp AI' bên phải... (Ctrl + Enter để gửi)"></textarea>
+          
+          <div class="composer-footer">
+            <span class="shortcuts-hint">
+              Phím tắt: <kbd>Ctrl+Enter</kbd> gửi • <kbd>Alt+I</kbd> chèn nháp
+            </span>
+
+            <button class="btn-send" onclick="sendReply()">
+              <span>Gửi phản hồi</span>
+              <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CỘT 3: AI CO-PILOT SIDEBAR (380px) -->
+    <aside class="ai-sidebar glass-panel">
+      <!-- Header -->
+      <div class="ai-sidebar-header">
+        <h3>
+          <span class="live-indicator"></span>
+          <span>AI Co-pilot Insights</span>
+        </h3>
+        <span class="model-badge">Gemini 1.5 Flash</span>
+      </div>
+
+      <!-- F02: TRIAGE CARD -->
+      <div class="ai-card glass-card">
+        <div class="ai-card-title">
+          <span>Phân tích hội thoại (F02)</span>
+          <span class="tag-badge tag-intent" id="aiConfidenceBadge">Độ tin cậy: 95%</span>
+        </div>
+
+        <div class="triage-grid">
+          <div class="triage-cell">
+            <span class="triage-cell-label">Ý định chính</span>
+            <span class="triage-cell-value" style="color: var(--brand-primary);" id="aiIntentValue">DELIVERY_ISSUE</span>
+          </div>
+          <div class="triage-cell" style="background: #FFF1F2; border-color: #FECDD3;">
+            <span class="triage-cell-label" style="color: var(--urgent-red);">Cảm xúc</span>
+            <span class="triage-cell-value" style="color: var(--urgent-red);" id="aiSentimentValue">NEGATIVE (Bực tức)</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px;">
+          <span style="color: var(--text-secondary); font-weight: 600;">Mức độ ưu tiên:</span>
+          <span class="tag-badge tag-urgent" id="aiPriorityValue" style="font-size: 11px;">URGENT (Khẩn cấp)</span>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-secondary); font-style: italic; background: rgba(241, 245, 249, 0.8); padding: 8px 10px; border-radius: 8px;" id="aiReasonValue">
+          "Khách hàng bức xúc vì đơn hàng trễ 4 ngày chưa nhận được và yêu cầu hủy/bồi thường."
+        </div>
+      </div>
+
+      <!-- F03: KNOWLEDGE BASE CITATION CARD -->
+      <div class="ai-card glass-card">
+        <div class="ai-card-title">
+          <span>Chính sách đối chiếu (F03 RAG)</span>
+          <span class="tag-badge" style="background: var(--rag-green-bg); color: var(--rag-green); border-color: var(--rag-green-border);" id="aiRagMatchBadge">Khớp 98%</span>
+        </div>
+
+        <div class="rag-quote-box">
+          <div class="rag-quote-title">
+            <svg style="width: 14px; height: 14px; color: var(--brand-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span id="aiRagDocTitle">Quy Định Vận Chuyển & Cam Kết Bồi Thường Giao Chậm</span>
+          </div>
+          <p id="aiRagCitation">
+            Điều 2: Đơn hàng giao trễ quá 3 ngày do lỗi vận chuyển được tặng voucher giảm giá 15% (tối đa 150k) cho đơn tiếp theo và miễn 100% phí ship đơn hiện tại.
+          </p>
+        </div>
+      </div>
+
+      <!-- F04: AI DRAFT PROPOSAL CARD (PEARL GLOW) -->
+      <div class="draft-card pearl-box">
+        <div class="draft-header">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 15px;">✨</span>
+            <span style="font-size: 12px; font-weight: 800; color: #1E1B4B;">Bản nháp gợi ý (F04)</span>
+          </div>
+          <span class="draft-tone-pill" id="aiDraftToneBadge">FORMAL (Trang trọng)</span>
+        </div>
+
+        <div class="draft-content-text" id="aiDraftContent">
+          Dạ em chào anh Tuấn ạ! Em rất tiếc và thành thật xin lỗi anh về việc đơn hàng ORD-9821 bị trễ hạn 4 ngày khiến anh phiền lòng...
+        </div>
+
+        <!-- 1-Click Insert Button -->
+        <button class="btn-insert-draft" onclick="insertDraftToComposer()">
+          <span>✨ Chèn Bản Nháp AI (1-Click)</span>
+        </button>
+      </div>
+
+      <!-- F07: FEEDBACK CARD -->
+      <div class="feedback-card">
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Đánh giá bản nháp này:</span>
+        <div class="feedback-actions">
+          <button class="btn-feedback" id="btnFeedbackHelpful" onclick="submitFeedback('HELPFUL')">
+            👍 Hữu ích
+          </button>
+          <button class="btn-feedback" id="btnFeedbackPoor" onclick="submitFeedback('POOR')">
+            👎
+          </button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- MODAL 1: KNOWLEDGE BASE MANAGER -->
+  <div class="view-overlay" id="modalKB">
+    <div class="modal-content-glass">
+      <div class="modal-header">
+        <h2>📚 Quản Lý Cơ Sở Tri Thức (Knowledge Base D2C)</h2>
+        <button class="btn-close-modal" onclick="closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <input type="text" placeholder="Tìm bài viết chính sách..." style="padding: 8px 14px; border-radius: 10px; border: 1px solid #CBD5E1; font-size: 12px; width: 320px;" oninput="filterKBArticles(this.value)">
+          <button class="btn-send" onclick="showToast('Tính năng thêm bài viết mới sẽ có trong phiên bản v1.1!', 'info')">+ Thêm bài viết mới</button>
+        </div>
+        <div id="kbArticlesList" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Render từ mock-data.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: BRAND TONE CONFIG -->
+  <div class="view-overlay" id="modalTone">
+    <div class="modal-content-glass" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2>🎨 Cấu Hình Văn Phong Thương Hiệu (Brand Tone)</h2>
+        <button class="btn-close-modal" onclick="closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Chọn phong cách phản hồi mặc định cho AI Co-pilot khi sinh câu trả lời gợi ý CSKH (F04):
+        </p>
+        <div id="brandToneOptionsList" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Render từ mock-data.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: DASHBOARD ANALYTICS -->
+  <div class="view-overlay" id="modalDashboard">
+    <div class="modal-content-glass">
+      <div class="modal-header">
+        <h2>📊 Báo Cáo Hiệu Suất CSKH & Tác Động AI</h2>
+        <button class="btn-close-modal" onclick="closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-card-label">Tổng hội thoại hôm nay</div>
+            <div class="metric-card-value">48</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Thời gian phản hồi TB</div>
+            <div class="metric-card-value">1m 18s</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Tỷ lệ chấp nhận AI Draft</div>
+            <div class="metric-card-value" style="color: #059669;">88.4%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-card-label">Tuân thủ cam kết SLA</div>
+            <div class="metric-card-value" style="color: #4F46E5;">99.4%</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Phân bố Ý định Khách hàng (Intent Triage)</h3>
+        <div id="dashboardIntentList" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Render từ mock-data.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: ROLE SWITCHER -->
+  <div class="view-overlay" id="modalRole">
+    <div class="modal-content-glass" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2>👤 Chuyển Đổi Vai Trò Người Dùng</h2>
+        <button class="btn-close-modal" onclick="closeAllModals()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">Chọn tài khoản để trải nghiệm phân quyền hệ thống:</p>
+        <div id="roleUserList" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Render từ mock-data.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="mock-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+
