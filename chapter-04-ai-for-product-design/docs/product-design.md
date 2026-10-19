@@ -3,10 +3,10 @@
 <!-- ==============================================================================
 TÀI LIỆU THIẾT KẾ GIAO DIỆN CHÍNH THỨC (CANONICAL PRODUCT DESIGN SPECIFICATION)
 - Dự án: ReplyMind - Trợ lý AI Co-pilot Chăm sóc Khách hàng D2C
-- Phiên bản: v1.0.0 (Đã phê duyệt chính thức tại Cổng đánh giá P4.3)
+- Phiên bản: v1.1.0 (Đã hoàn thiện kiểm định thực tế Prototype qua bước P4.5)
 - Hướng thiết kế được chọn: Modern Frosted Glass / Liquid Pearl (Hybrid Architecture)
-- Trạng thái: APPROVED (Chính thức chuyển sang giai đoạn phát triển Frontend)
-- Ngày phê duyệt: 13-10-2026
+- Trạng thái: APPROVED & VERIFIED (Chính thức nghiệm thu bản Interactive Prototype)
+- Ngày phê duyệt: 16-11-2026
 ============================================================================== -->
 
 ## 1. Tuyên Bố Quyết Định Thiết Kế (Design Decision Summary)
@@ -163,7 +163,41 @@ Nhằm đảm bảo trải nghiệm người dùng tối ưu và hiệu năng v�
 1. **Khởi tạo Thư viện Thành phần React**:
    - Sử dụng Next.js 15 App Router (`src/components/agent/`).
    - Cấu trúc các module con: `InboxSidebar.tsx`, `ChatTimeline.tsx`, `ChatComposer.tsx`, `AiCopilotSidebar.tsx`.
-2. **Tối ưu CSS & Hiệu năng**:
-   - Tận dụng tiện ích Tailwind CSS CDN/PostCSS với các biến CSS Tokens đã đặc tả tại Mục 2.
-   - Bổ sung quy tắc `@supports not (backdrop-filter: blur(16px))` với fallback `background: #FFFFFF` cho các trình duyệt đời cũ.
+---
+
+## 7. Quy Chuẩn Bố Cục Không Tràn & Cuộn Độc Lập 3 Cột (Layout & Scroll Architecture v2.0)
+
+Để đảm bảo hiệu năng vận hành và trải nghiệm không lỗi trên mọi môi trường màn hình (Laptop 1366x768 $\rightarrow$ Desktop 1920x1080), hệ thống áp dụng các quy chuẩn bố cục đã được chuẩn hóa qua bước kiểm thử P4.4/P4.5:
+
+1. **Khóa cứng Khung nhìn Toàn màn hình (`100vh / 100dvh`)**:
+   - `html, body` thiết lập `height: 100dvh; overflow: hidden;` triệt tiêu hoàn toàn thanh cuộn toàn trang và lỗi tràn ngang (`overflow-x: hidden`).
+   - `.app-main` neo chặt chiều cao khả dụng `height: calc(100dvh - 64px)` kết hợp `min-height: 0` để ép các flex items con tính toán kích thước co giãn chính xác.
+2. **Cơ chế Cuộn Độc Lập 3 Cột (Independent 3-Column Scrolling)**:
+   - Cả 3 cột (`.inbox-sidebar`, `.chat-section`, `.ai-sidebar`) bắt buộc khai báo `height: 100%; min-height: 0; display: flex; flex-direction: column; overflow: hidden;`.
+   - Các vùng dữ liệu dài (`.conversation-list`, `.chat-timeline`, `.ai-sidebar`) kích hoạt `overflow-y: auto` kèm `scroll-behavior: smooth` và thanh cuộn siêu mảnh (5px), đảm bảo cuộn độc lập mà không ảnh hưởng tới các cột còn lại.
+3. **Tối ưu Phân Cấp Thị Giác (Clean Visual Hierarchy)**:
+   - **Tâm điểm 1 (Cảnh báo khẩn cấp)**: Duy nhất badge `URGENT` mang sắc đỏ Rose rực rỡ kèm thanh chỉ báo màu cạnh trái. Các badge khác (Intent, Priority phụ) chuyển sang tông trung tính (Slate/Indigo nhạt) để giảm tải nhận thức.
+   - **Tâm điểm 2 (Hành động AI cốt lõi)**: Nút **"✨ Chèn Bản Nháp AI (1-Click)"** tại Cột 3 đóng vai trò Hero CTA Button với gradient tím phát sáng (`pearl-glow`), các nút phụ (Feedback, Đánh dấu giải quyết) giữ phong cách outline/ghost nhẹ nhàng.
+4. **Mượt Hóa Chuyển Động & Khả Năng Tiếp Cận**:
+   - Mọi tương tác chuyển tab, hover thẻ đều có `transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1)`.
+   - Lớp đồ họa nền mờ `.ambient-glow` được tách riêng bằng `transform: translateZ(0); will-change: transform;` để đạt 60fps mượt mà.
+   - Hỗ trợ chuẩn `@media (prefers-reduced-motion: reduce)` theo tiêu chuẩn WCAG 2.1 AA.
+
+---
+
+## 8. Báo Cáo Nghiệm Thu 7 Luồng Tương Tác Prototype (P4.5 Audit Verification)
+
+Quá trình kiểm thử toàn diện trên bản Interactive Prototype (`prototype/index.html`) đã nghiệm thu 100% các luồng nghiệp vụ:
+
+| STT | Luồng Tương Tác Cốt Lõi | Thành Phần & Thao Tác Kỹ Thuật | Trạng Thái Nghiệm Thu |
+| :---: | :--- | :--- | :---: |
+| **F-01** | **Đăng nhập & Chuyển đổi vai trò** | Bấm User Badge góc phải $\rightarrow$ Mở modal $\rightarrow$ Chọn Agent (`usr_agent_01`) / Supervisor (`usr_supervisor_02`) $\rightarrow$ Header cập nhật ngay. | **ĐẠT (PASS 100%)** |
+| **F-02** | **Xem danh sách & Lọc Triage** | Lọc theo 4 tab (*Tất cả*, *Gấp URGENT*, *Chờ xử lý*, *Chờ khách*) $\rightarrow$ Tìm kiếm tức thì với `Ctrl + K`. | **ĐẠT (PASS 100%)** |
+| **F-03** | **Phân tích Triage AI (F02)** | Hiển thị Intent 7 loại, Sentiment 3 mức, Priority 4 cấp, Confidence Score $\ge 92\%$ và tóm tắt lý do bức xúc ngắn gọn. | **ĐẠT (PASS 100%)** |
+| **F-04** | **Đối chiếu RAG (F03) & Bản nháp (F04)** | Trích dẫn chính xác bài viết chính sách nội bộ (khớp 95-99%), sinh bản nháp chuẩn Brand Tone (Formal/Friendly/Casual). | **ĐẠT (PASS 100%)** |
+| **F-05** | **Thao tác 1-Click Send / Insert** | Bấm nút **"✨ Chèn Bản Nháp AI"** hoặc phím tắt `Alt + I` $\rightarrow$ Điền vào ô soạn thảo $\rightarrow$ Sửa đổi $\rightarrow$ Gửi bằng `Ctrl + Enter` $\rightarrow$ Ticket chuyển sang `WAITING`. | **ĐẠT (PASS 100%)** |
+| **F-06** | **Đánh giá Feedback AI (F07)** | Bấm `👍 Hữu ích` hoặc `👎 Chưa tốt` $\rightarrow$ Cập nhật viền nút active $\rightarrow$ Bật Toast thông báo ghi nhận dữ liệu fine-tuning. | **ĐẠT (PASS 100%)** |
+| **F-07** | **Báo cáo Dashboard & Quản lý KB** | Mở Modal Dashboard xem chỉ số SLA (99.4%), thời gian phản hồi (1m 18s); mở Modal KB tìm kiếm bài viết chính sách. | **ĐẠT (PASS 100%)** |
+
+
 

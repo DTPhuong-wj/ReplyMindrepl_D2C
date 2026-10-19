@@ -449,18 +449,27 @@ html, body {
 
 .tag-badge {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 600;
   padding: 2px 7px;
   border-radius: 6px;
   border: 1px solid transparent;
+  transition: all 0.18s ease;
 }
 
-.tag-urgent { background: var(--urgent-red-bg); color: var(--urgent-red); border-color: var(--urgent-red-border); }
-.tag-high { background: #FEF3C7; color: #B45309; }
-.tag-medium { background: #E0F2FE; color: #0369A1; }
-.tag-low { background: #F1F5F9; color: #64748B; }
+/* Duy nhất badge URGENT nổi bật sắc đỏ cảnh báo cao cấp */
+.tag-urgent { 
+  background: var(--urgent-red-bg); 
+  color: var(--urgent-red); 
+  border-color: var(--urgent-red-border);
+  font-weight: 800;
+  box-shadow: 0 1px 3px rgba(225, 29, 72, 0.15);
+}
 
-.tag-intent { background: #EEF2FF; color: #4338CA; border-color: #C7D2FE; }
+/* Các tag thứ cấp được làm dịu nhẹ, trung tính để không tranh chấp thị giác */
+.tag-high { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+.tag-medium { background: #F1F5F9; color: #64748B; border-color: #E2E8F0; }
+.tag-low { background: #F8FAFC; color: #94A3B8; border-color: #F1F5F9; }
+.tag-intent { background: #F1F5F9; color: #475569; border-color: #E2E8F0; font-weight: 600; }
 
 /* CỘT 2: KHUNG CHAT CHI TIẾT */
 .chat-header {
@@ -827,27 +836,34 @@ html, body {
   color: var(--text-primary);
 }
 
+/* Hero Call-to-Action: 1-Click Send / Insert Button */
 .btn-insert-draft {
   width: 100%;
-  padding: 10px;
+  padding: 11px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
   color: white;
   border: none;
   font-size: 13px;
   font-weight: 800;
+  letter-spacing: 0.2px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-insert-draft:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(79, 70, 229, 0.45);
+  filter: brightness(1.05);
+}
+
+.btn-insert-draft:active {
+  transform: translateY(0);
 }
 
 .feedback-card {
@@ -1059,5 +1075,15 @@ html, body {
   .ai-sidebar { width: 290px; padding: 10px; }
   .inbox-sidebar { width: 240px; }
   .app-main { padding: 0 10px 10px 10px; gap: 8px; }
+}
+
+/* Khả năng tiếp cận: Tôn trọng cấu hình giảm chuyển động (WCAG 2.1 AA) */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
