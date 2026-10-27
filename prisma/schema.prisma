@@ -1,10 +1,11 @@
 // ==============================================================================
-// Sơ đồ Cơ sở Dữ liệu Prisma: Hệ thống ReplyMind
-// Các Mô hình Thực thể: User, Conversation, Message, KnowledgeBase, AIFeedback
+// Sơ đồ Cơ sở Dữ liệu Prisma: Hệ thống ReplyMind (Chương 5 - MySQL 8.0)
+// Hỗ trợ Multi-tenant Isolation (brand_id) & Phân quyền RBAC (ADMIN, MANAGER, AGENT)
+// Các Thực thể: Brand, User, BrandTone, KnowledgeBase, Conversation, Message, AIFeedback
 // ==============================================================================
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,157 +13,270 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// ------------------------------------------------------------------------------
+// ENUMS
+// ------------------------------------------------------------------------------
+
 enum Role {
-  AGENT       // Nhân viên hỗ trợ
-  SUPERVISOR  // Trưởng nhóm giám sát
-  ADMIN       // Quản trị viên hệ thống
+  ADMIN       // Quản trị viên thương hiệu
+  MANAGER     // Trưởng nhóm giám sát (Quản lý SLA & KB)
+  SUPERVISOR  // Bí danh tương thích Supervisor
+  AGENT       // Nhân viên CSKH trực chat
+}
+
+enum BrandStatus {
+  ACTIVE      // Đang hoạt động
+  SUSPENDED   // Tạm khóa dịch vụ
+  TRIAL       // Đang dùng thử
+}
+
+enum UserStatus {
+  ACTIVE      // Hoạt động bình thường
+  INACTIVE    // Bị vô hiệu hóa
+}
+
+enum ToneType {
+  FRIENDLY      // Thân thiện & nhiệt tình
+  PROFESSIONAL  // Chuyên nghiệp & chỉn chu
+  EMPATHETIC    // Đồng cảm & chu đáo
+  FORMAL        // Trang trọng & lịch sự
+}
+
+enum Channel {
+  FACEBOOK    // Facebook Messenger
+  ZALO        // Zalo OA
+  WEB_CHAT    // Livechat website
+  SHOPEE      // Kênh TMĐT Shopee Chat
 }
 
 enum ConversationStatus {
-  OPEN              // Đang mở / Chờ tiếp nhận
-  PENDING_CUSTOMER  // Chờ phản hồi từ khách hàng
-  RESOLVED          // Đã giải quyết xong
-  CLOSED            // Đã đóng hội thoại
+  OPEN        // Đang mở / Chờ tiếp nhận
+  PENDING     // Đang chờ khách phản hồi
+  RESOLVED    // Đã xử lý xong
+  CLOSED      // Đã đóng phiên
 }
 
 enum PriorityLevel {
-  LOW     // Mức ưu tiên thấp
-  MEDIUM  // Mức trung bình
-  HIGH    // Mức cao
-  URGENT  // Khẩn cấp
+  URGENT  // Khẩn cấp (SLA < 15 phút, khiếu nại, khách giận dữ)
+  HIGH    // Mức cao (SLA < 30 phút, hỏi mua hàng, đơn phát sinh lỗi)
+  MEDIUM  // Trung bình (SLA < 60 phút, tra cứu thông tin)
+  LOW     // Thấp (Góp ý chung)
 }
 
 enum IntentType {
-  ORDER_STATUS      // Tra cứu tình trạng đơn hàng
-  RETURN_REQUEST    // Yêu cầu đổi trả / hoàn tiền
-  PRODUCT_INQUIRY   // Hỏi đáp về sản phẩm / tư vấn
-  BILLING_ISSUE     // Vấn đề thanh toán / hóa đơn
-  GENERAL_FEEDBACK  // Ý kiến đóng góp chung
+  ORDER_STATUS      // Tra cứu tình trạng vận chuyển / giao nhận
+  RETURN_EXCHANGE   // Yêu cầu đổi trả hàng hóa, kích ứng
+  PRODUCT_INQUIRY   // Tư vấn thành phần, cách sử dụng
+  COMPLAINT         // Khiếu nại dịch vụ / thái độ / trễ hạn
+  PAYMENT_PROMO     // Hỏi voucher, mã giảm giá, thanh toán
   OTHER             // Khác
 }
 
 enum SentimentType {
-  POSITIVE    // Tích cực
+  ANGRY       // Giận dữ / Bức xúc
+  FRUSTRATED  // Thất vọng / Khó chịu
   NEUTRAL     // Trung tính
-  FRUSTRATED  // Thất vọng / khó chịu
-  ANGRY       // Giận dữ
-}
-
-enum BrandTone {
-  FRIENDLY      // Thân thiện & nhiệt tình
-  PROFESSIONAL  // Chuyên nghiệp & ngắn gọn
-  CASUAL        // Gần gũi & trẻ trung
-  FORMAL        // Trang trọng & lịch sự
+  SATISFIED   // Hài lòng
+  EXCITED     // Phấn khích / Khen ngợi
+  POSITIVE    // Tích cực (Bí danh tổng quát)
+  NEGATIVE    // Tiêu cực (Bí danh tổng quát)
 }
 
 enum MessageSender {
-  CUSTOMER    // Tin nhắn từ khách hàng
-  AGENT       // Tin nhắn do nhân viên gửi
-  AI_COPILOT  // Dự thảo hoặc phản hồi từ AI
-  SYSTEM      // Thông báo tự động từ hệ thống
+  CUSTOMER    // Khách hàng gửi đến
+  AGENT       // Nhân viên CSKH gửi
+  SYSTEM      // Hệ thống tự động
+  AI_DRAFT    // Bản nháp AI Co-pilot gợi ý
 }
 
-enum FeedbackAction {
-  ACCEPTED_UNMODIFIED   // Chấp thuận nguyên văn bản nháp của AI
-  ACCEPTED_WITH_EDITS   // Chấp thuận sau khi nhân viên có chỉnh sửa
-  REJECTED              // Từ chối sử dụng bản nháp
-  FLAGGED_INACCURATE    // Báo cáo nội dung AI không chính xác
+enum FeedbackRating {
+  HELPFUL       // Hữu ích (👍)
+  NOT_HELPFUL   // Không hữu ích (👎)
 }
 
+// ------------------------------------------------------------------------------
+// MODELS
+// ------------------------------------------------------------------------------
+
+/// Thương hiệu D2C (Đơn vị gốc phân chia Đa thuê bao - Multi-tenant Root)
+model Brand {
+  id             String         @id @default(uuid()) @db.VarChar(36)
+  name           String         @db.VarChar(100)
+  code           String         @unique @db.VarChar(50)
+  logoUrl        String?        @map("logo_url") @db.VarChar(255)
+  status         BrandStatus    @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  // Quan hệ 1-N cách ly dữ liệu
+  users          User[]
+  brandTones     BrandTone[]
+  knowledgeBases KnowledgeBase[]
+  conversations  Conversation[]
+  messages       Message[]
+  aiFeedbacks    AIFeedback[]
+
+  @@map("brands")
+}
+
+/// Tài khoản người dùng hệ thống (Nhân viên CSKH, Quản lý, Admin)
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  name          String?
-  role          Role           @default(AGENT)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id           String      @id @default(uuid()) @db.VarChar(36)
+  brandId      String      @map("brand_id") @db.VarChar(36)
+  brand        Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
-  assignedConversations Conversation[] @relation("AssignedAgent")
-  authoredArticles      KnowledgeBase[] @relation("ArticleAuthor")
-  feedbackGiven         AIFeedback[]   @relation("AgentFeedback")
+  email        String      @unique @db.VarChar(150)
+  passwordHash String      @map("password_hash") @db.VarChar(255)
+  fullName     String      @map("full_name") @db.VarChar(100)
+  role         Role        @default(AGENT)
+  status       UserStatus  @default(ACTIVE)
+  lastLoginAt  DateTime?   @map("last_login_at")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
 
+  // Quan hệ nghiệp vụ
+  assignedConversations Conversation[]  @relation("AssignedAgent")
+  sentMessages          Message[]       @relation("SentMessages")
+  authoredArticles      KnowledgeBase[] @relation("AuthoredArticles")
+  feedbacksGiven        AIFeedback[]    @relation("AgentFeedback")
+
+  @@index([brandId])
   @@map("users")
 }
 
+/// Cấu hình phong cách và nguyên tắc văn phong thương hiệu (Brand Tone Persona)
+model BrandTone {
+  id              String      @id @default(uuid()) @db.VarChar(36)
+  brandId         String      @map("brand_id") @db.VarChar(36)
+  brand           Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  personaName     String      @map("persona_name") @db.VarChar(50)
+  toneType        ToneType    @default(FRIENDLY) @map("tone_type")
+  primaryPronoun  String      @map("primary_pronoun") @db.VarChar(50)
+  customerPronoun String      @map("customer_pronoun") @db.VarChar(50)
+  dosGuidelines   String      @map("dos_guidelines") @db.Text
+  dontsGuidelines String      @map("donts_guidelines") @db.Text
+  isDefault       Boolean     @default(true) @map("is_default")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@index([brandId])
+  @@map("brand_tones")
+}
+
+/// Cơ sở tri thức: Bài viết chính sách, điều khoản bảo hành & FAQ
+model KnowledgeBase {
+  id        String    @id @default(uuid()) @db.VarChar(36)
+  brandId   String    @map("brand_id") @db.VarChar(36)
+  brand     Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  category  String    @db.VarChar(100)
+  title     String    @db.VarChar(255)
+  content   String    @db.Text
+  keywords  Json?
+  isActive  Boolean   @default(true) @map("is_active")
+
+  createdBy String?   @map("created_by") @db.VarChar(36)
+  author    User?     @relation("AuthoredArticles", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@index([brandId, isActive, category])
+  @@map("knowledge_base")
+}
+
+/// Phiên hội thoại giữa khách hàng và thương hiệu
 model Conversation {
-  id              String             @id @default(cuid())
-  customerEmail   String
-  customerName    String?
-  status          ConversationStatus @default(OPEN)
-  priority        PriorityLevel      @default(MEDIUM)
-  detectedIntent  IntentType?
-  latestSentiment SentimentType?
-  
-  assignedAgentId String?
-  assignedAgent   User?              @relation("AssignedAgent", fields: [assignedAgentId], references: [id])
-  
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id                 String             @id @default(uuid()) @db.VarChar(36)
+  brandId            String             @map("brand_id") @db.VarChar(36)
+  brand              Brand              @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
-  messages        Message[]
-  aiFeedback      AIFeedback[]
+  customerName       String             @map("customer_name") @db.VarChar(100)
+  customerIdentifier String             @map("customer_identifier") @db.VarChar(100)
+  channel            Channel            @default(WEB_CHAT)
 
-  @@index([status, priority])
+  assignedAgentId    String?            @map("assigned_agent_id") @db.VarChar(36)
+  assignedAgent      User?              @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+
+  status             ConversationStatus @default(OPEN)
+  priority           PriorityLevel      @default(MEDIUM)
+  latestIntent       IntentType?        @map("latest_intent")
+  latestSentiment    SentimentType?     @map("latest_sentiment")
+
+  slaDeadline        DateTime?          @map("sla_deadline")
+  lastMessageAt      DateTime           @default(now()) @map("last_message_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  // Quan hệ 1-N
+  messages           Message[]
+  aiFeedbacks        AIFeedback[]
+
+  @@index([brandId, priority, status, lastMessageAt])
   @@index([assignedAgentId])
   @@map("conversations")
 }
 
+/// Chi tiết tin nhắn trong cuộc hội thoại (kèm metadata phân tích AI)
 model Message {
-  id             String        @id @default(cuid())
-  conversationId String
-  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  
-  senderType     MessageSender
-  senderId       String?
-  content        String        @db.Text
-  
-  // Siêu dữ liệu AI phân tích cho tin nhắn của khách hàng
+  id             String         @id @default(uuid()) @db.VarChar(36)
+  conversationId String         @map("conversation_id") @db.VarChar(36)
+  conversation   Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  brandId        String         @map("brand_id") @db.VarChar(36)
+  brand          Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  senderType     MessageSender  @map("sender_type")
+  senderId       String?        @map("sender_id") @db.VarChar(36)
+  sender         User?          @relation("SentMessages", fields: [senderId], references: [id], onDelete: SetNull)
+
+  content        String         @db.Text
+  attachments    Json?
+
+  // Trường siêu dữ liệu AI phân loại trực tiếp cho tin nhắn khách hàng (F02)
   intent         IntentType?
   sentiment      SentimentType?
+  priority       PriorityLevel?
   confidence     Float?
+  aiMetadata     Json?          @map("ai_metadata")
 
-  createdAt      DateTime      @default(now())
+  isRead         Boolean        @default(false) @map("is_read")
+  sentAt         DateTime       @default(now()) @map("sent_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
 
-  @@index([conversationId, createdAt])
+  aiFeedbacks    AIFeedback[]
+
+  @@index([conversationId, sentAt])
+  @@index([brandId])
   @@map("messages")
 }
 
-model KnowledgeBase {
-  id          String    @id @default(cuid())
-  title       String
-  slug        String    @unique
-  category    String
-  content     String    @db.Text
-  isPublished Boolean   @default(true)
-  
-  authorId    String
-  author      User      @relation("ArticleAuthor", fields: [authorId], references: [id])
-  
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([category, isPublished])
-  @@map("knowledge_base")
-}
-
+/// Nhật ký đánh giá của nhân viên về câu trả lời gợi ý của AI (F06)
 model AIFeedback {
-  id              String         @id @default(cuid())
-  conversationId  String
-  conversation    Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  
-  agentId         String
-  agent           User           @relation("AgentFeedback", fields: [agentId], references: [id])
-  
-  promptVersion   String?
-  suggestedReply  String         @db.Text
-  finalReplySent  String?        @db.Text
-  actionTaken     FeedbackAction
-  rating          Int?           // Điểm số đánh giá từ 1 đến 5 sao
-  comment         String?
-  
-  createdAt       DateTime       @default(now())
+  id                 String         @id @default(uuid()) @db.VarChar(36)
+  brandId            String         @map("brand_id") @db.VarChar(36)
+  brand              Brand          @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
+  conversationId     String         @map("conversation_id") @db.VarChar(36)
+  conversation       Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  messageId          String?        @map("message_id") @db.VarChar(36)
+  message            Message?       @relation(fields: [messageId], references: [id], onDelete: SetNull)
+
+  agentId            String         @map("agent_id") @db.VarChar(36)
+  agent              User           @relation("AgentFeedback", fields: [agentId], references: [id], onDelete: Cascade)
+
+  rating             FeedbackRating
+  originalDraft      String         @map("original_draft") @db.Text
+  finalSentText      String         @map("final_sent_text") @db.Text
+  editDistanceRatio  Float          @map("edit_distance_ratio")
+  rejectionReason    String?        @map("rejection_reason") @db.VarChar(255)
+
+  createdAt          DateTime       @default(now()) @map("created_at")
+
+  @@index([brandId, rating, createdAt])
   @@index([conversationId])
   @@index([agentId])
-  @@map("ai_feedback")
+  @@map("ai_feedbacks")
 }

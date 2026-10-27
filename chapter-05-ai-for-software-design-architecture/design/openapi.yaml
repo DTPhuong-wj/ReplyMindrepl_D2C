@@ -1,0 +1,872 @@
+openapi: 3.0.3
+info:
+  title: ReplyMind Backend API Specification
+  description: >-
+    Hợp đồng API chuẩn cho hệ thống ReplyMind - Nền tảng AI Co-pilot hỗ trợ CSKH
+    cho thương hiệu D2C. Hỗ trợ Multi-tenant isolation qua brand_id, cơ chế RBAC
+    (ADMIN, SUPERVISOR, AGENT), và tích hợp AI Structured JSON output.
+  version: 1.0.0
+  contact:
+    name: ReplyMind Engineering Team
+    email: dev@replymind.io
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+  - url: https://api.replymind.io/api
+    description: Production Environment
+
+tags:
+  - name: Auth
+    description: Xác thực người dùng và quản lý phiên làm việc JWT
+  - name: Conversations
+    description: Quản lý hộp thư, danh sách hội thoại và luồng tin nhắn CSKH
+  - name: AI Co-pilot
+    description: Các endpoint điều phối mô hình AI (Phân loại F02, Gợi ý phản hồi F04)
+  - name: Knowledge Base
+    description: Quản lý và tra cứu bài viết chính sách, FAQ thương hiệu
+  - name: Brand Tone
+    description: Cấu hình phong cách và nguyên tắc văn phong thương hiệu
+  - name: Feedbacks & Quality
+    description: Thu thập phản hồi 👍/👎 của nhân viên và đánh giá chất lượng AI
+  - name: Dashboard
+    description: Thống kê hiệu suất SLA, điểm trợ giúp AI và khối lượng công việc
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Đăng nhập hệ thống và nhận JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: agent.chi@luminasport.vn
+                password:
+                  type: string
+                  format: password
+                  example: Password@123
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT Bearer Token có thời hạn 8 giờ
+                  user:
+                    $ref: '#/components/schemas/UserResponse'
+                  brand:
+                    $ref: '#/components/schemas/BrandSummary'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Lấy thông tin tài khoản đang đăng nhập
+      operationId: getCurrentUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Thông tin người dùng hiện tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /conversations:
+    get:
+      tags:
+        - Conversations
+      summary: Lấy danh sách hội thoại theo bộ lọc (Hộp thư CSKH)
+      operationId: listConversations
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [ALL, URGENT, HIGH, MEDIUM, LOW]
+            default: ALL
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ALL, OPEN, PENDING, RESOLVED, CLOSED]
+            default: OPEN
+        - name: intent
+          in: query
+          schema:
+            type: string
+            enum: [ORDER_STATUS, RETURN_EXCHANGE, PRODUCT_INQUIRY, COMPLAINT, PAYMENT_PROMO, OTHER]
+        - name: search
+          in: query
+          description: Tìm kiếm theo tên khách hàng hoặc mã hội thoại
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Danh sách hội thoại phân trang
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConversationItem'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+
+  /conversations/{id}:
+    get:
+      tags:
+        - Conversations
+      summary: Lấy chi tiết phiên hội thoại
+      operationId: getConversationById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chi tiết hội thoại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationDetail'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /conversations/{id}/messages:
+    get:
+      tags:
+        - Conversations
+      summary: Lấy toàn bộ lịch sử tin nhắn trong phiên hội thoại
+      operationId: getConversationMessages
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lịch sử tin nhắn
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageItem'
+    post:
+      tags:
+        - Conversations
+      summary: Gửi tin nhắn phản hồi tới khách hàng (Agent / 1-Click Send)
+      operationId: sendConversationMessage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  description: Nội dung tin nhắn gửi đi
+                  example: Dạ chào anh Tuấn, shop đã kiểm tra đơn hàng #LM-8924...
+                ai_draft_id:
+                  type: string
+                  format: uuid
+                  description: ID của bản nháp gợi ý AI nếu gửi qua 1-Click Send
+      responses:
+        '201':
+          description: Tin nhắn đã được gửi và lưu trữ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageItem'
+
+  /ai/classify-intent-sentiment:
+    post:
+      tags:
+        - AI Co-pilot
+      summary: 'F02: Phân loại ý định (Intent), Cảm xúc (Sentiment) và Độ khẩn cấp (Priority)'
+      operationId: classifyIntentSentiment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - latest_message
+              properties:
+                conversation_id:
+                  type: string
+                  format: uuid
+                customer_name:
+                  type: string
+                  example: Nguyễn Văn Tuấn
+                latest_message:
+                  type: string
+                  example: Áo giao bị rách đường may ở vai, tôi yêu cầu hoàn tiền gấp trong hôm nay!
+                history:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      sender:
+                        type: string
+                        enum: [CUSTOMER, AGENT]
+                      text:
+                        type: string
+      responses:
+        '200':
+          description: Kết quả phân tích có cấu trúc từ LLM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIClassificationResponse'
+
+  /ai/generate-reply:
+    post:
+      tags:
+        - AI Co-pilot
+      summary: 'F04: Tạo bản nháp câu trả lời gợi ý (Grounding RAG + Brand Tone)'
+      operationId: generateAIReply
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+              properties:
+                conversation_id:
+                  type: string
+                  format: uuid
+                focus_topic:
+                  type: string
+                  description: Chủ đề hoặc điều kiện đặc biệt nếu có
+      responses:
+        '200':
+          description: Bản nháp câu trả lời được sinh kèm trích dẫn chính sách
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReplyDraftResponse'
+
+  /knowledge-base:
+    get:
+      tags:
+        - Knowledge Base
+      summary: Lấy danh sách bài viết chính sách / FAQ của thương hiệu
+      operationId: listKnowledgeBase
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách bài viết tri thức
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KnowledgeBaseArticle'
+    post:
+      tags:
+        - Knowledge Base
+      summary: Thêm mới bài viết chính sách (Yêu cầu quyền ADMIN hoặc SUPERVISOR)
+      operationId: createKnowledgeBaseArticle
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseInput'
+      responses:
+        '201':
+          description: Bài viết đã được tạo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseArticle'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /knowledge-base/{id}:
+    get:
+      tags:
+        - Knowledge Base
+      summary: Lấy chi tiết bài viết chính sách
+      operationId: getKnowledgeBaseArticle
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chi tiết bài viết
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseArticle'
+    put:
+      tags:
+        - Knowledge Base
+      summary: Cập nhật bài viết chính sách (ADMIN/SUPERVISOR)
+      operationId: updateKnowledgeBaseArticle
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeBaseInput'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeBaseArticle'
+
+  /brand-tones:
+    get:
+      tags:
+        - Brand Tone
+      summary: Lấy cấu hình phong cách văn phong thương hiệu
+      operationId: getBrandTone
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Hồ sơ văn phong hiện tại của thương hiệu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandToneProfile'
+    put:
+      tags:
+        - Brand Tone
+      summary: Cập nhật Brand Tone & Nguyên tắc NÊN/CẤM (ADMIN only)
+      operationId: updateBrandTone
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandToneInput'
+      responses:
+        '200':
+          description: Cập nhật Brand Tone thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandToneProfile'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /ai/feedbacks:
+    post:
+      tags:
+        - Feedbacks & Quality
+      summary: 'F06: Ghi nhận đánh giá 👍/👎 và tỷ lệ sửa đổi của Agent'
+      operationId: submitAIFeedback
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - conversation_id
+                - rating
+                - original_draft
+                - final_sent_text
+              properties:
+                conversation_id:
+                  type: string
+                  format: uuid
+                message_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                rating:
+                  type: string
+                  enum: [HELPFUL, NOT_HELPFUL]
+                original_draft:
+                  type: string
+                final_sent_text:
+                  type: string
+                rejection_reason:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Phản hồi đã được ghi nhận vào nhật ký cải tiến AI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  edit_distance_ratio:
+                    type: number
+                    format: float
+                    example: 0.12
+                  status:
+                    type: string
+                    example: RECORDED
+
+  /dashboard/stats:
+    get:
+      tags:
+        - Dashboard
+      summary: 'F07: Lấy số liệu thống kê hiệu suất CSKH và độ tin cậy AI'
+      operationId: getDashboardStats
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: timeframe
+          in: query
+          schema:
+            type: string
+            enum: [TODAY, THIS_WEEK, THIS_MONTH]
+            default: TODAY
+      responses:
+        '200':
+          description: Chỉ số phân tích tổng hợp
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardMetrics'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Nhập chuỗi JWT Bearer token được cấp từ endpoint /auth/login.
+
+  responses:
+    UnauthorizedError:
+      description: Yêu cầu thiếu JWT token hoặc token hết hạn
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: Người dùng không đủ quyền hạn (RBAC) thực hiện thao tác
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundError:
+      description: Không tìm thấy tài nguyên yêu cầu
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: UNAUTHORIZED
+        message:
+          type: string
+          example: Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.
+        timestamp:
+          type: string
+          format: date-time
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        full_name:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN, SUPERVISOR, AGENT]
+        brand_id:
+          type: string
+          format: uuid
+
+    BrandSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Lumina Fashion
+        code:
+          type: string
+          example: lumina-fashion
+
+    ConversationItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        customer_name:
+          type: string
+        channel:
+          type: string
+          enum: [FACEBOOK, ZALO, WEB_CHAT, SHOPEE]
+        priority:
+          type: string
+          enum: [URGENT, HIGH, MEDIUM, LOW]
+        status:
+          type: string
+          enum: [OPEN, PENDING, RESOLVED, CLOSED]
+        latest_intent:
+          type: string
+          enum: [ORDER_STATUS, RETURN_EXCHANGE, PRODUCT_INQUIRY, COMPLAINT, PAYMENT_PROMO, OTHER]
+        latest_sentiment:
+          type: string
+          enum: [ANGRY, FRUSTRATED, NEUTRAL, SATISFIED, EXCITED]
+        last_message_preview:
+          type: string
+        sla_deadline:
+          type: string
+          format: date-time
+        last_message_at:
+          type: string
+          format: date-time
+
+    ConversationDetail:
+      allOf:
+        - $ref: '#/components/schemas/ConversationItem'
+        - type: object
+          properties:
+            customer_identifier:
+              type: string
+            assigned_agent_id:
+              type: string
+              format: uuid
+              nullable: true
+            ai_summary:
+              type: string
+              example: Khách khiếu nại đơn #LM-8924 bị lỗi đường may, yêu cầu đổi gấp trước 18h.
+
+    MessageItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        conversation_id:
+          type: string
+          format: uuid
+        sender_type:
+          type: string
+          enum: [CUSTOMER, AGENT, SYSTEM, AI_DRAFT]
+        sender_name:
+          type: string
+        content:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+        ai_metadata:
+          type: object
+          nullable: true
+
+    AIClassificationResponse:
+      type: object
+      required:
+        - intent
+        - confidence
+        - sentiment
+        - priority
+        - urgency_reason
+      properties:
+        intent:
+          type: string
+          enum: [ORDER_STATUS, RETURN_EXCHANGE, PRODUCT_INQUIRY, COMPLAINT, PAYMENT_PROMO, OTHER]
+        confidence:
+          type: number
+          format: float
+          example: 0.96
+        sentiment:
+          type: string
+          enum: [ANGRY, FRUSTRATED, NEUTRAL, SATISFIED, EXCITED]
+        priority:
+          type: string
+          enum: [URGENT, HIGH, MEDIUM, LOW]
+        urgency_reason:
+          type: string
+          example: Khách hàng thất vọng vì hàng lỗi, dùng từ 'hoàn tiền gấp' trong hôm nay.
+        recommended_kb_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    AIReplyDraftResponse:
+      type: object
+      required:
+        - draft_reply
+        - brand_tone_applied
+        - policy_citations
+        - action_checklist
+      properties:
+        draft_reply:
+          type: string
+          example: Dạ chào anh Tuấn, shop thành thật xin lỗi vì sự cố áo bị lỗi đường may...
+        brand_tone_applied:
+          type: string
+          example: Thân thiện, Đồng cảm, Cam kết bảo hành
+        policy_citations:
+          type: array
+          items:
+            type: object
+            properties:
+              kb_id:
+                type: string
+                format: uuid
+              title:
+                type: string
+                example: Chính sách đổi trả 1-đổi-1 trong 7 ngày
+              clause:
+                type: string
+                example: Điều 2.1 - Hàng lỗi kỹ thuật từ NSX được đổi mới miễn phí ship 2 chiều.
+        action_checklist:
+          type: array
+          items:
+            type: string
+            example: Tạo đơn thu hồi ship tận nơi mã TH-8924
+
+    KnowledgeBaseArticle:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        category:
+          type: string
+          example: Chính sách đổi trả
+        title:
+          type: string
+          example: Quy định đổi trả hàng lỗi sản xuất trong 7 ngày
+        content:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        updated_at:
+          type: string
+          format: date-time
+
+    KnowledgeBaseInput:
+      type: object
+      required:
+        - category
+        - title
+        - content
+      properties:
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+          default: true
+
+    BrandToneProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        persona_name:
+          type: string
+          example: Thân thiện & Đồng cảm D2C
+        tone_type:
+          type: string
+          enum: [FRIENDLY, PROFESSIONAL, EMPATHETIC, FORMAL]
+        primary_pronoun:
+          type: string
+          example: Shop / Em
+        customer_pronoun:
+          type: string
+          example: Dạ Bạn / Dạ Quý khách
+        dos_guidelines:
+          type: array
+          items:
+            type: string
+        donts_guidelines:
+          type: array
+          items:
+            type: string
+
+    BrandToneInput:
+      type: object
+      required:
+        - persona_name
+        - tone_type
+        - primary_pronoun
+        - customer_pronoun
+      properties:
+        persona_name:
+          type: string
+        tone_type:
+          type: string
+          enum: [FRIENDLY, PROFESSIONAL, EMPATHETIC, FORMAL]
+        primary_pronoun:
+          type: string
+        customer_pronoun:
+          type: string
+        dos_guidelines:
+          type: array
+          items:
+            type: string
+        donts_guidelines:
+          type: array
+          items:
+            type: string
+
+    DashboardMetrics:
+      type: object
+      properties:
+        total_conversations_handled:
+          type: integer
+          example: 142
+        urgent_pending_count:
+          type: integer
+          example: 3
+        average_response_time_seconds:
+          type: integer
+          example: 48
+        sla_compliance_percentage:
+          type: number
+          format: float
+          example: 97.5
+        ai_helpfulness_score_percentage:
+          type: number
+          format: float
+          example: 92.4
+        ai_one_click_adoption_rate:
+          type: number
+          format: float
+          example: 78.6
+

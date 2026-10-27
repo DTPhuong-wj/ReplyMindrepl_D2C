@@ -77,19 +77,85 @@ npm install
 
 ---
 
-## 4. Khởi Tạo Cơ Sở Dữ Liệu Prisma (Tùy Chọn khi dùng PostgreSQL)
+## 4. Hướng Dẫn Cài Đặt MySQL & Khởi Tạo Database (Chương 5)
 
-Khi bạn đã có dịch vụ PostgreSQL đang chạy:
+Theo quyết định kiến trúc chính thức ở **Chương 5 (ADR-0003)**, ReplyMind sử dụng **MySQL 8.0** làm cơ sở dữ liệu quan hệ chính với mô hình Đa thuê bao (Multi-tenant) cách ly qua `brand_id`. Dưới đây là các bước thiết lập chi tiết để khởi tạo CSDL `replymind_db` và nạp dữ liệu Demo mẫu:
+
+### 4.1. Chuẩn Bị & Cài Đặt MySQL 8.0
+
+Bạn có thể lựa chọn 1 trong 2 cách sau:
+
+#### Cách 1: Khởi chạy nhanh qua Docker (Khuyến nghị)
+Khởi chạy container MySQL 8.0 với tên database `replymind_db`:
 ```bash
-# Tạo Prisma Client
-npm run db:generate
-
-# Chạy Migration tạo bảng
-npm run db:migrate
-
-# Mở Prisma Studio để xem dữ liệu trực quan trên trình duyệt
-npm run db:studio
+docker run --name replymind-mysql -e MYSQL_ROOT_PASSWORD=RootPassword@123 -e MYSQL_DATABASE=replymind_db -p 3306:3306 -d mysql:8.0 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
+
+#### Cách 2: Cài Đặt MySQL Server Cục Bộ (Windows / XAMPP / MySQL Workbench)
+1. Cài đặt **MySQL Community Server 8.0** hoặc khởi động dịch vụ MySQL trong XAMPP/Laragon.
+2. Mở MySQL Command Line Client hoặc MySQL Workbench, đăng nhập với tài khoản `root` và tạo cơ sở dữ liệu `replymind_db`:
+   ```sql
+   CREATE DATABASE IF NOT EXISTS replymind_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+---
+
+### 4.2. Cấu Hình Chuỗi Kết Nối DATABASE_URL
+
+Mở tệp `.env.local` (hoặc `.env`) và cập nhật thông số `DATABASE_URL` theo đúng định dạng MySQL:
+```env
+# Cấu hình Cơ sở dữ liệu MySQL 8.0 cho kiến trúc Đa thuê bao (Chương 5)
+DATABASE_URL="mysql://root:RootPassword@123@localhost:3306/replymind_db"
+```
+*(Lưu ý: Nếu dùng tài khoản root không có mật khẩu cục bộ, đặt `DATABASE_URL="mysql://root:@localhost:3306/replymind_db"`).*
+
+---
+
+### 4.3. Đẩy Cấu Trúc Bảng Lên MySQL (`npx prisma db push`)
+
+Hệ thống quản lý 7 bảng dữ liệu quan hệ (`Brand`, `User`, `BrandTone`, `KnowledgeBase`, `Conversation`, `Message`, `AIFeedback`). Đồng bộ cấu trúc bảng tự động:
+```bash
+npx prisma db push
+```
+*(Lệnh này đọc trực tiếp `prisma/schema.prisma` và tự động tạo 7 bảng quan hệ, các khóa ngoại và chỉ mục Composite Index trên MySQL `replymind_db`).*
+
+Đồng thời cập nhật Prisma Client cho TypeScript:
+```bash
+npx prisma generate
+```
+
+---
+
+### 4.4. Nạp Dữ Liệu Demo Mẫu D2C (`npx prisma db seed`)
+
+Chạy kịch bản nạp sẵn dữ liệu Demo cho thương hiệu D2C **"Lumina Skincare"** (1 Brand, 3 tài khoản RBAC Admin/Manager/Agent, 1 BrandTone, 4 bài viết Knowledge Base và 3 Hội thoại mẫu có phân loại AI Intent/Sentiment/Urgency):
+```bash
+# Cách 1: Sử dụng npx tsx thông qua Prisma (Khuyến nghị cho ESM)
+npx prisma db seed
+
+# Cách 2: Thông qua npm script
+npm run db:seed
+
+# Cách 3: Chạy trực tiếp bằng Node.js v22+ (Native Type Stripping, không cần thêm tool)
+npm run db:seed:node
+```
+
+---
+
+### 4.5. Mở Trình Quản Trị Dữ Liệu Trực Quan (`npx prisma studio`)
+
+Để kiểm tra trực quan các bản ghi đã nạp vào 7 bảng dữ liệu trên trình duyệt web:
+```bash
+npx prisma studio
+```
+Truy cập: 👉 **[http://localhost:5555](http://localhost:5555)**
+Tại đây bạn có thể duyệt qua bảng `brands`, `users`, `conversations`, `messages`, `knowledge_base`, `brand_tones`, `ai_feedbacks` một cách trực quan.
+
+> **Mẹo linh hoạt**: Nếu bạn đang trong môi trường chưa cài đặt MySQL, ứng dụng vẫn có tầng dự phòng **Mock Data D2C** (`src/services/db/mock-data.ts`) tự động hoạt động mượt mà cho giao diện Prototype và các bài kiểm thử tự động!
+```
+Truy cập: 👉 **[http://localhost:5555](http://localhost:5555)**
+
+> **Mẹo linh hoạt**: Nếu bạn đang trong môi trường không cài đặt MySQL, ứng dụng vẫn có tầng dự phòng **Mock Data D2C** (`src/services/db/mock-data.ts`) tự động hoạt động hoàn hảo cho giao diện Prototype và các bài kiểm thử!
 
 ---
 
@@ -179,4 +245,31 @@ npm run test:e2e
   ```powershell
   Get-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess | Stop-Process -Force
   ```
+
+### 8.6. Lỗi Xung Đột ES Module (ESM) Khi Chạy `npx prisma db seed` với `ts-node`
+- **Triệu chứng**:
+  - `TypeError [ERR_UNKNOWN_FILE_EXTENSION]: Unknown file extension ".ts" for prisma/seed.ts`
+  - Hoặc `SyntaxError: Cannot use import statement outside a module`
+- **Nguyên nhân**:
+  - Dự án ReplyMind cấu hình TypeScript hiện đại với `moduleResolution: "bundler"` và cú pháp ES Module (`import/export`).
+  - Bộ công cụ `ts-node` mặc định chạy ở chế độ CommonJS và thường xung đột với cơ chế tải module trên Node.js v18/v20/v22+ nếu thiếu cờ loader hoặc cấu hình tsconfig phức tạp.
+- **Cách khắc phục triệt để**:
+  1. **Giải pháp 1 (Khuyến nghị chuẩn của Prisma)**: Thay thế `ts-node` bằng công cụ hiện đại `tsx` (dựa trên esbuild, hỗ trợ ESM và TypeScript out-of-the-box):
+     - Trong `package.json`:
+       ```json
+       "prisma": {
+         "seed": "npx tsx prisma/seed.ts"
+       }
+       ```
+     - Chạy lệnh nạp dữ liệu:
+       ```bash
+       npx prisma db seed
+       ```
+  2. **Giải pháp 2 (Sử dụng Node.js v22+ Native Type Stripping - Không phụ thuộc tool bên ngoài)**:
+     - Chạy trực tiếp bằng script đã cấu hình sẵn trong `package.json`:
+       ```bash
+       npm run db:seed:node
+       ```
+     *(Lệnh tương đương: `node --experimental-strip-types prisma/seed.ts`).*
+
 

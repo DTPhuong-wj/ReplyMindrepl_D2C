@@ -1,0 +1,110 @@
+erDiagram
+    BRANDS ||--o{ USERS : "has many"
+    BRANDS ||--o{ BRAND_TONES : "configures"
+    BRANDS ||--o{ KNOWLEDGE_BASE : "owns"
+    BRANDS ||--o{ CONVERSATIONS : "isolates"
+    BRANDS ||--o{ AI_FEEDBACKS : "records"
+    
+    USERS ||--o{ CONVERSATIONS : "assigned to"
+    USERS ||--o{ MESSAGES : "sends (agent)"
+    USERS ||--o{ AI_FEEDBACKS : "evaluates"
+
+    CONVERSATIONS ||--o{ MESSAGES : "contains"
+    CONVERSATIONS ||--o{ AI_FEEDBACKS : "related to"
+    MESSAGES ||--o{ AI_FEEDBACKS : "references draft of"
+
+    BRANDS {
+        varchar(36) id PK "UUID thương hiệu (Tenant ID)"
+        varchar(100) name "Tên thương hiệu D2C (e.g. Lumina Fashion)"
+        varchar(50) code UK "Mã định danh duy nhất (slug)"
+        varchar(255) logo_url "URL ảnh đại diện thương hiệu"
+        enum status "ACTIVE, SUSPENDED, TRIAL"
+        datetime created_at "Thời điểm khởi tạo"
+        datetime updated_at "Thời điểm cập nhật"
+    }
+
+    USERS {
+        varchar(36) id PK "UUID người dùng"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (Multi-tenant discriminator)"
+        varchar(150) email UK "Email đăng nhập hệ thống"
+        varchar(255) password_hash "Chuỗi băm mật khẩu Argon2/Bcrypt"
+        varchar(100) full_name "Họ và tên nhân viên"
+        enum role "ADMIN, SUPERVISOR, AGENT"
+        enum status "ACTIVE, INACTIVE"
+        datetime last_login_at "Lần đăng nhập gần nhất"
+        datetime created_at "Thời điểm tạo"
+        datetime updated_at "Thời điểm cập nhật"
+    }
+
+    BRAND_TONES {
+        varchar(36) id PK "UUID hồ sơ văn phong"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (1:1 hoặc 1:N)"
+        varchar(50) persona_name "Tên văn phong (e.g. Thân thiện D2C, Chuyên nghiệp)"
+        enum tone_type "FRIENDLY, PROFESSIONAL, EMPATHETIC, FORMAL"
+        varchar(50) primary_pronoun "Xưng hô CSKH (e.g. Shop, Em, Chúng tôi)"
+        varchar(50) customer_pronoun "Xưng hô Khách (e.g. Bạn, Dạ Quý khách)"
+        text dos_guidelines "Nguyên tắc NÊN làm (gạch đầu dòng JSON/text)"
+        text donts_guidelines "Nguyên tắc CẤM kỵ (gạch đầu dòng JSON/text)"
+        boolean is_default "Trạng thái văn phong mặc định áp dụng"
+        datetime created_at "Thời điểm tạo"
+        datetime updated_at "Thời điểm cập nhật"
+    }
+
+    KNOWLEDGE_BASE {
+        varchar(36) id PK "UUID bài viết tri thức"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (Multi-tenant discriminator)"
+        varchar(100) category "Phân loại (e.g. Đổi trả, Vận chuyển, Bảo hành)"
+        varchar(255) title "Tiêu đề chính sách / câu hỏi thường gặp"
+        text content "Nội dung chi tiết quy định và điều khoản"
+        json keywords "Mảng từ khóa tìm kiếm (JSON array)"
+        boolean is_active "Trạng thái hiệu lực (true = được nạp vào RAG)"
+        varchar(36) created_by FK "ID nhân viên tạo bài viết"
+        datetime created_at "Thời điểm tạo"
+        datetime updated_at "Thời điểm cập nhật"
+    }
+
+    CONVERSATIONS {
+        varchar(36) id PK "UUID phiên hội thoại"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (Multi-tenant discriminator)"
+        varchar(100) customer_name "Tên khách hàng"
+        varchar(100) customer_identifier "SĐT, Facebook ID, Zalo User ID"
+        enum channel "FACEBOOK, ZALO, WEB_CHAT, SHOPEE"
+        varchar(36) assigned_agent_id FK "Nhân viên CSKH phụ trách (nullable)"
+        enum status "OPEN, PENDING, RESOLVED, CLOSED"
+        enum priority "URGENT, HIGH, MEDIUM, LOW"
+        enum latest_intent "ORDER_STATUS, RETURN_EXCHANGE, PRODUCT_INQUIRY, COMPLAINT, PAYMENT_PROMO, OTHER"
+        enum latest_sentiment "ANGRY, FRUSTRATED, NEUTRAL, SATISFIED, EXCITED"
+        datetime sla_deadline "Hạn chót xử lý SLA"
+        datetime last_message_at "Thời điểm tin nhắn mới nhất"
+        datetime created_at "Thời điểm bắt đầu hội thoại"
+        datetime updated_at "Thời điểm cập nhật"
+    }
+
+    MESSAGES {
+        varchar(36) id PK "UUID tin nhắn"
+        varchar(36) conversation_id FK "Liên kết CONVERSATIONS.id"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (Denormalized để query nhanh)"
+        enum sender_type "CUSTOMER, AGENT, SYSTEM, AI_DRAFT"
+        varchar(36) sender_id "ID nhân viên gửi (nullable nếu là Customer/AI)"
+        text content "Nội dung văn bản tin nhắn"
+        json attachments "Danh sách link ảnh/file đính kèm (JSON array)"
+        json ai_metadata "Lưu {intent, confidence, sentiment, urgency_reason, recommended_kb_ids}"
+        boolean is_read "Đã đọc bởi Agent hay chưa"
+        datetime sent_at "Thời điểm gửi tin nhắn"
+        datetime created_at "Thời điểm lưu bản ghi"
+    }
+
+    AI_FEEDBACKS {
+        varchar(36) id PK "UUID bản ghi đánh giá"
+        varchar(36) brand_id FK "Liên kết BRANDS.id (Multi-tenant discriminator)"
+        varchar(36) conversation_id FK "Liên kết CONVERSATIONS.id"
+        varchar(36) message_id FK "Liên kết MESSAGES.id (Tin nhắn AI gợi ý)"
+        varchar(36) agent_id FK "Nhân viên CSKH thực hiện đánh giá"
+        enum rating "HELPFUL, NOT_HELPFUL"
+        text original_draft "Nội dung AI ban đầu sinh ra"
+        text final_sent_text "Nội dung thực tế agent đã gửi đi sau chỉnh sửa"
+        float edit_distance_ratio "Tỷ lệ sai khác Levenshtein giữa draft và final"
+        varchar(255) rejection_reason "Lý do từ chối (Wrong policy, Inappropriate tone, etc.)"
+        datetime created_at "Thời điểm gửi feedback"
+    }
+

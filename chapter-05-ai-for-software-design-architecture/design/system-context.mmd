@@ -1,0 +1,84 @@
+graph TB
+    %% Users & Personas
+    subgraph Users ["Người Dùng Hệ Thống (Personas)"]
+        Customer["Khách Hàng (Customer)<br/>[Kênh MXH, Zalo, Web Chat]"]
+        Agent["Nhân Viên CSKH (Agent)<br/>[Xử lý hội thoại, 1-Click Send]"]
+        Supervisor["Trưởng Nhóm / QA (Supervisor)<br/>[Giám sát SLA, Quản lý KB]"]
+        Admin["Quản Trị Viên (Brand Admin)<br/>[Cấu hình Brand Tone, User RBAC]"]
+    end
+
+    %% Main Application Boundary
+    subgraph ReplyMindSystem ["Ranh Giới Ứng Dụng ReplyMind (Next.js Modular Monolith)"]
+        subgraph PresentationLayer ["Tầng Giao Diện (Presentation Layer - React 19 / Next.js)"]
+            AgentWorkspace["Agent Workspace UI<br/>(Hộp thư, Chat Box, AI Copilot Sidebar)"]
+            KBManagerUI["Knowledge Base UI<br/>(Soạn thảo & Đồng bộ FAQ / Chính sách)"]
+            AdminSettingsUI["Admin & Tone UI<br/>(Cấu hình Brand Tone & Nguyên tắc)"]
+            AnalyticsDashboardUI["Dashboard UI<br/>(Thống kê SLA & AI Helpfulness)"]
+        end
+
+        subgraph CoreAPILayer ["Tầng Dịch Vụ & Điều Phối (Next.js Route Handlers / Services)"]
+            AuthService["Auth & RBAC Service<br/>(JWT, Tenant Context)"]
+            ConversationService["Conversation Service<br/>(Quản lý Hội thoại & Tin nhắn)"]
+            KBService["Knowledge Base Service<br/>(Truy xuất chính sách & RAG Context)"]
+            ToneService["Brand Tone Service<br/>(Quản lý Persona văn phong)"]
+            FeedbackService["AI Feedback Service<br/>(Ghi nhận 👍/👎, Audit Logs)"]
+            
+            subgraph AIEngineModule ["Mô-đun AI Co-pilot (src/services/ai/)"]
+                ClassifierEngine["F02: Intent & Sentiment Classifier<br/>(Zero-shot & Few-shot Parser)"]
+                ReplyGeneratorEngine["F04: Reply Generator<br/>(Grounding RAG + Brand Tone Guardrails)"]
+                StructuredValidator["Zod Structured Output Validator<br/>(Strict JSON Schema Enforcer)"]
+            end
+        end
+    end
+
+    %% Data Storage Boundary
+    subgraph DataStorageLayer ["Tầng Lưu Trữ & Cơ Sở Dữ Liệu"]
+        MySQL[("Cơ Sở Dữ Liệu MySQL 8.0<br/>(Multi-tenant Isolation qua brand_id)<br/>7 Bảng: Brands, Users, Conversations,<br/>Messages, KnowledgeBase, BrandTones, AIFeedbacks")]
+    end
+
+    %% External Systems Boundary
+    subgraph ExternalServices ["Dịch Vụ Bên Ngoài (External Services)"]
+        OmnichannelGateway["Cổng Hội Thoại Đa Kênh<br/>(Webhook Facebook / Zalo / Web Chat)"]
+        LLMProvider["Nhà Cung Cấp LLM API<br/>(Google Gemini 2.0 Flash / OpenAI GPT-4o)<br/>[Strict JSON Mode]"]
+    end
+
+    %% Interactions & Flows
+    Customer -->|Gửi tin nhắn thắc mắc/khiếu nại| OmnichannelGateway
+    OmnichannelGateway -->|Webhook POST /api/webhooks/incoming| ConversationService
+
+    Agent -->|Đăng nhập & Thao tác CSKH| AgentWorkspace
+    Supervisor -->|Cập nhật chính sách & Xem báo cáo| KBManagerUI
+    Supervisor -->|Theo dõi SLA & AI Quality| AnalyticsDashboardUI
+    Admin -->|Cấu hình Brand Tone & Phân quyền| AdminSettingsUI
+
+    AgentWorkspace -->|REST API /api/conversations| ConversationService
+    AgentWorkspace -->|Trigger AI Analysis & Draft| AIEngineModule
+    KBManagerUI -->|REST API /api/knowledge-base| KBService
+    AdminSettingsUI -->|REST API /api/brand-tones| ToneService
+    AnalyticsDashboardUI -->|REST API /api/dashboard/stats| FeedbackService
+
+    AuthService -.->|Kiểm tra JWT & brand_id context| ConversationService
+    AuthService -.->|Kiểm tra JWT & brand_id context| KBService
+    AuthService -.->|Kiểm tra JWT & brand_id context| ToneService
+
+    ConversationService -->|Trigger phân loại tin nhắn mới| ClassifierEngine
+    ClassifierEngine -->|Đọc System Prompt F02| LLMProvider
+    LLMProvider -->|Trả về JSON Intent/Sentiment/Priority| StructuredValidator
+    StructuredValidator -->|Lưu kết quả phân loại| ConversationService
+
+    AgentWorkspace -->|Bấm Yêu cầu Gợi ý Phản hồi| ReplyGeneratorEngine
+    ReplyGeneratorEngine -->|Lấy ngữ cảnh chính sách| KBService
+    ReplyGeneratorEngine -->|Lấy văn phong thương hiệu| ToneService
+    ReplyGeneratorEngine -->|Prompt F04 + Context + Guardrails| LLMProvider
+    LLMProvider -->|Bản nháp gợi ý JSON| StructuredValidator
+    StructuredValidator -->|Hiển thị bản nháp lên Copilot Sidebar| AgentWorkspace
+
+    AgentWorkspace -->|Bấm 1-Click Send| ConversationService
+    AgentWorkspace -->|Gửi Feedback 👍/👎 & Edit Diff| FeedbackService
+
+    ConversationService -->|CRUD qua Prisma ORM| MySQL
+    KBService -->|CRUD qua Prisma ORM| MySQL
+    ToneService -->|CRUD qua Prisma ORM| MySQL
+    FeedbackService -->|Ghi nhận đánh giá & Metrics| MySQL
+    AuthService -->|Truy vấn User & Brand| MySQL
+
