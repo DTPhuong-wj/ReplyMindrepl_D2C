@@ -190,7 +190,51 @@ npm run test:e2e
 
 ---
 
-## 7. Cấu Trúc Các Thư Mục Quan Trọng
+## 7. Hướng Dẫn Mở Xem Trước (Preview) Sơ Đồ Mermaid (.mmd) & Hợp Đồng OpenAPI (.yaml) Trong VS Code / Cursor
+
+Hệ thống tài liệu thiết kế kiến trúc và hợp đồng API của ReplyMind tại thư mục `chapter-05-ai-for-software-design-architecture/design/` có thể được mở xem trực quan nhanh chóng bằng các extension phổ biến hoặc trình duyệt web:
+
+### 7.1. Mở Xem Trước Sơ Đồ Mermaid (`system-context.mmd` & `data-model.mmd`)
+
+- **Vị trí tệp**:
+  - `chapter-05-ai-for-software-design-architecture/design/system-context.mmd` (Sơ đồ Ngữ cảnh Hệ thống C4)
+  - `chapter-05-ai-for-software-design-architecture/design/data-model.mmd` (Sơ đồ ERD 7 bảng CSDL MySQL)
+
+- **Cách 1: Sử dụng Extension trong VS Code / Cursor (Khuyến nghị)**:
+  1. Mở mục Extensions (`Ctrl + Shift + X`), tìm và cài đặt:
+     - **Mermaid Preview** (của *vstirbu*) HOẶC **Markdown Preview Mermaid Support** (của *Matt Bierner*).
+  2. Mở tệp `.mmd` cần xem trong cửa sổ soạn thảo.
+  3. Nhấn tổ hợp phím `Ctrl + Shift + V` (hoặc nhấp chuột vào biểu tượng kính lúp / nút **Open Preview to the Side** ở góc trên cùng bên phải thanh công cụ).
+  4. Sơ đồ C4 hoặc ERD sẽ được render trực quan song song cạnh mã nguồn.
+
+- **Cách 2: Sử dụng Mermaid Live Editor trên Trình Duyệt Web**:
+  1. Truy cập: 👉 **[https://mermaid.live](https://mermaid.live)**
+  2. Mở tệp `system-context.mmd` hoặc `data-model.mmd`, sao chép toàn bộ nội dung mã.
+  3. Dán vào khung soạn thảo bên trái màn hình của Mermaid Live.
+  4. Khung xem trước bên phải sẽ tự động hiển thị sơ đồ và cho phép tải ảnh minh chứng định dạng PNG / SVG (`01-system-context-diagram.png`, `02-mysql-erd-diagram.png`).
+
+---
+
+### 7.2. Mở Xem Trước Hợp Đồng API OpenAPI 3.0 (`openapi.yaml`)
+
+- **Vị trí tệp**:
+  - `chapter-05-ai-for-software-design-architecture/design/openapi.yaml` (Hợp đồng API chuẩn OpenAPI 3.0.3)
+
+- **Cách 1: Sử dụng Extension trong VS Code / Cursor (Khuyến nghị)**:
+  1. Mở mục Extensions (`Ctrl + Shift + X`), tìm và cài đặt:
+     - **Swagger Viewer** (của *Arjun*) HOẶC **OpenAPI (Swagger) Editor** (của *42Crunch*).
+  2. Mở tệp `openapi.yaml`.
+  3. Nhấn tổ hợp phím `Shift + Alt + E` (hoặc mở Command Palette `Ctrl + Shift + P` $\rightarrow$ gõ `Swagger: Open Preview to the Side`).
+  4. Toàn bộ tài liệu API tương tác với giao diện Swagger UI chuyên nghiệp (các nhóm endpoint Auth, Conversations, AI Co-pilot F02/F04, KB, Tone, Feedback, Dashboard) sẽ hiển thị trực quan.
+
+- **Cách 2: Sử dụng Swagger Editor trên Trình Duyệt Web**:
+  1. Truy cập: 👉 **[https://editor.swagger.io/](https://editor.swagger.io/)**
+  2. Nhấp vào menu **File** $\rightarrow$ **Import file** $\rightarrow$ Chọn tệp `chapter-05-ai-for-software-design-architecture/design/openapi.yaml` (hoặc dán trực tiếp nội dung YAML).
+  3. Giao diện Swagger UI bên phải sẽ tự động kiểm tra cú pháp và hiển thị đầy đủ tài liệu API phục vụ việc chụp ảnh minh chứng (`03-openapi-swagger-preview.png`).
+
+---
+
+## 8. Cấu Trúc Các Thư Mục Quan Trọng
 
 - `src/components/agent/`: Bàn làm việc của nhân viên CSKH (Hộp thư, Khung chat, Phân tích AI, Nút 1-Click).
 - `src/components/knowledge-base/`: Giao diện quản lý bài viết chính sách và FAQ.
@@ -198,11 +242,12 @@ npm run test:e2e
 - `src/components/dashboard/`: Biểu đồ thống kê và Tiện ích điểm hữu ích của AI.
 - `src/services/ai/`: Bộ điều phối AI (Gemini Client, Context Builder, RAG search, Intent Classifier).
 - `src/services/db/`: Tầng truy xuất CSDL Prisma kèm Mock Data D2C dự phòng.
+- `chapter-05-ai-for-software-design-architecture/`: Bộ tài liệu thiết kế kiến trúc, quyết định ADRs, sơ đồ Mermaid và đặc tả OpenAPI.
 - `prompts/`: Kho lưu trữ quản lý phiên bản các câu lệnh hệ thống.
 
 ---
 
-## 8. Xử Lý Sự Cố Thường Gặp (Troubleshooting)
+## 9. Xử Lý Sự Cố Thường Gặp (Troubleshooting)
 
 ### 8.1. Lỗi `EPERM: operation not permitted` (Khóa tệp trên Windows)
 - **Triệu chứng**: `npm error code EPERM`, không thể xóa hoặc ghi đè thư mục `node_modules` (như `fast-glob`, `next`).
